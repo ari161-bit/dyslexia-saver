@@ -25,7 +25,7 @@ export async function createAssignmentAction(_prev: AssignmentActionResult, form
 
   const supabase = await createClient();
   const { data: assignment, error } = await supabase
-    .from("assignments")
+    .from("bp_assignments")
     .insert({
       teacher_id: user.profile.id,
       class_id: classId,
@@ -51,7 +51,7 @@ export async function markSubmissionReviewedAction(submissionId: string, assignm
   if (!user?.profile) return { error: "Please sign in." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("submissions").update({ status: "reviewed" }).eq("id", submissionId);
+  const { error } = await supabase.from("bp_submissions").update({ status: "reviewed" }).eq("id", submissionId);
   if (error) return { error: "Couldn't update this submission." };
 
   revalidatePath(`/teacher/assignments/${assignmentId}`);

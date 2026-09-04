@@ -11,7 +11,7 @@ import { signOutAction } from "@/lib/actions/auth";
 import { ROLE_LABEL } from "@/lib/nav-config";
 import type { Tables } from "@/lib/types/database";
 
-export function AccountSettingsForm({ profile, email }: { profile: Tables<"profiles">; email: string }) {
+export function AccountSettingsForm({ profile, email }: { profile: Tables<"bp_profiles">; email: string }) {
   const [state, formAction, pending] = useActionState<ProfileActionResult, FormData>(updateProfileAction, {});
 
   return (

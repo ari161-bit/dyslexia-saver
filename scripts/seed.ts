@@ -23,7 +23,7 @@ const supabase = createClient<Database>(url, serviceKey, {
 
 const PASSWORD = "Demo1234!";
 
-async function createUser(email: string, firstName: string, lastName: string, role: Database["public"]["Tables"]["profiles"]["Row"]["role"]) {
+async function createUser(email: string, firstName: string, lastName: string, role: Database["public"]["Tables"]["bp_profiles"]["Row"]["role"]) {
   const { data: created, error } = await supabase.auth.admin.createUser({
     email,
     password: PASSWORD,
@@ -34,7 +34,7 @@ async function createUser(email: string, firstName: string, lastName: string, ro
       const { data: list } = await supabase.auth.admin.listUsers();
       const existing = list?.users.find((u) => u.email === email);
       if (existing) {
-        const { data: profile } = await supabase.from("profiles").select("*").eq("auth_user_id", existing.id).maybeSingle();
+        const { data: profile } = await supabase.from("bp_profiles").select("*").eq("auth_user_id", existing.id).maybeSingle();
         if (profile) return profile;
       }
     }
@@ -43,7 +43,7 @@ async function createUser(email: string, firstName: string, lastName: string, ro
 
   const studentCode = role === "student" ? Math.random().toString(36).slice(2, 8).toUpperCase() : null;
   const { data: profile, error: profileError } = await supabase
-    .from("profiles")
+    .from("bp_profiles")
     .insert({ auth_user_id: created.user.id, first_name: firstName, last_name: lastName, role, student_code: studentCode })
     .select("*")
     .single();
@@ -55,7 +55,7 @@ async function main() {
   console.log("Seeding Brightpath demo data...");
 
   const { data: school, error: schoolError } = await supabase
-    .from("schools")
+    .from("bp_schools")
     .upsert({ name: "Maple Ridge Elementary" }, { onConflict: "name" })
     .select("*")
     .single();
@@ -72,7 +72,7 @@ async function main() {
     const profile = await createUser(t.email, t.firstName, t.lastName, "teacher");
     teachers.push(profile);
     await supabase
-      .from("school_members")
+      .from("bp_school_members")
       .upsert({ school_id: school.id, user_id: profile.id, role: "teacher", status: "approved" }, { onConflict: "school_id,user_id" });
   }
   console.log(`Teachers: ${teachers.length}`);
@@ -108,7 +108,7 @@ async function main() {
   console.log(`Parents: ${parents.length}`);
 
   for (let i = 0; i < parents.length; i++) {
-    await supabase.from("parent_student_links").upsert(
+    await supabase.from("bp_parent_student_links").upsert(
       { parent_id: parents[i].id, student_id: students[i].id, relationship: "Parent", status: "approved" },
       { onConflict: "parent_id,student_id" },
     );
@@ -123,14 +123,14 @@ async function main() {
   const classes = [];
   for (const c of classSeeds) {
     const { data: cls, error } = await supabase
-      .from("classes")
+      .from("bp_classes")
       .insert({ school_id: school.id, teacher_id: c.teacher.id, name: c.name, grade: c.grade, subject: c.subject })
       .select("*")
       .single();
     if (error) throw error;
     classes.push({ ...cls, roster: c.students });
     for (const student of c.students) {
-      await supabase.from("class_members").upsert({ class_id: cls.id, student_id: student.id }, { onConflict: "class_id,student_id" });
+      await supabase.from("bp_class_members").upsert({ class_id: cls.id, student_id: student.id }, { onConflict: "class_id,student_id" });
     }
   }
   console.log(`Classes: ${classes.length}`);
@@ -146,7 +146,7 @@ async function main() {
 
   for (const r of resourceSeeds) {
     const { data: resource, error } = await supabase
-      .from("resources")
+      .from("bp_resources")
       .insert({
         owner_id: r.owner.id,
         school_id: school.id,
@@ -163,7 +163,7 @@ async function main() {
 
     const cls = classes[r.classIndex];
     const { data: assignment, error: assignError } = await supabase
-      .from("assignments")
+      .from("bp_assignments")
       .insert({
         teacher_id: r.owner.id,
         class_id: cls.id,
@@ -180,7 +180,7 @@ async function main() {
 
     for (const [i, student] of cls.roster.entries()) {
       const status = i % 3 === 0 ? "submitted" : i % 3 === 1 ? "in_progress" : "not_started";
-      await supabase.from("submissions").upsert(
+      await supabase.from("bp_submissions").upsert(
         {
           assignment_id: assignment.id,
           student_id: student.id,
@@ -192,7 +192,7 @@ async function main() {
       );
 
       if (status !== "not_started") {
-        await supabase.from("progress_events").insert({
+        await supabase.from("bp_progress_events").insert({
           student_id: student.id,
           resource_id: resource.id,
           event_type: "reading_session",
@@ -208,7 +208,7 @@ async function main() {
       if (Math.random() > 0.5) continue;
       const created = new Date();
       created.setDate(created.getDate() - d);
-      await supabase.from("progress_events").insert({
+      await supabase.from("bp_progress_events").insert({
         student_id: student.id,
         event_type: Math.random() > 0.5 ? "reading_session" : "practice_completed",
         metadata: { source: "seed" },

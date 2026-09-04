@@ -52,13 +52,13 @@ export async function generateAdaptationAction(resourceId: string, type: Adaptat
   if (!user?.profile) return { error: "Please sign in." };
 
   const supabase = await createClient();
-  const { data: resource } = await supabase.from("resources").select("extracted_text").eq("id", resourceId).maybeSingle();
+  const { data: resource } = await supabase.from("bp_resources").select("extracted_text").eq("id", resourceId).maybeSingle();
   if (!resource?.extracted_text) return { error: "This resource doesn't have readable text yet." };
 
   try {
     const content = await buildContent(type, resource.extracted_text, user.profile.id);
     const { data, error } = await supabase
-      .from("resource_adaptations")
+      .from("bp_resource_adaptations")
       .insert({ resource_id: resourceId, type, content, created_by: user.profile.id, approved: false })
       .select("id")
       .single();
@@ -77,7 +77,7 @@ export async function updateAdaptationAction(adaptationId: string, content: unkn
   if (!user?.profile) return { error: "Please sign in." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("resource_adaptations").update({ content }).eq("id", adaptationId);
+  const { error } = await supabase.from("bp_resource_adaptations").update({ content }).eq("id", adaptationId);
   if (error) return { error: "Couldn't save your changes." };
 
   revalidatePath(`/teacher/resources/${resourceId}/adapt`);
@@ -89,7 +89,7 @@ export async function setAdaptationApprovedAction(adaptationId: string, approved
   if (!user?.profile) return { error: "Please sign in." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("resource_adaptations").update({ approved }).eq("id", adaptationId);
+  const { error } = await supabase.from("bp_resource_adaptations").update({ approved }).eq("id", adaptationId);
   if (error) return { error: "Couldn't update publish status." };
 
   revalidatePath(`/teacher/resources/${resourceId}/adapt`);

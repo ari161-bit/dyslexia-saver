@@ -15,7 +15,7 @@ export async function respondToTeacherRequestAction(membershipId: string, approv
 
   const supabase = await createClient();
   const { error } = await supabase
-    .from("school_members")
+    .from("bp_school_members")
     .update({ status: approve ? "approved" : "rejected" })
     .eq("id", membershipId);
 
@@ -35,7 +35,7 @@ export async function createAnnouncementAction(_prev: SchoolActionResult, formDa
   if (!title || !schoolId) return { error: "Give your announcement a title." };
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc("create_school_announcement", {
+  const { error } = await supabase.rpc("bp_create_school_announcement", {
     p_school_id: schoolId,
     p_title: title,
     p_body: body || null,

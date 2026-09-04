@@ -20,7 +20,7 @@ export async function createClassAction(_prev: ClassActionResult, formData: Form
 
   const supabase = await createClient();
   const { data: membership } = await supabase
-    .from("school_members")
+    .from("bp_school_members")
     .select("school_id")
     .eq("user_id", user.profile.id)
     .eq("status", "approved")
@@ -28,7 +28,7 @@ export async function createClassAction(_prev: ClassActionResult, formData: Form
 
   if (!membership) return { error: "Your school membership needs to be approved before you can create classes." };
 
-  const { error } = await supabase.from("classes").insert({
+  const { error } = await supabase.from("bp_classes").insert({
     school_id: membership.school_id,
     teacher_id: user.profile.id,
     name,
@@ -51,10 +51,10 @@ export async function joinClassByCodeAction(_prev: ClassActionResult, formData: 
   if (!code) return { error: "Enter the class code your teacher shared." };
 
   const supabase = await createClient();
-  const { data: classId } = await supabase.rpc("find_class_by_code", { p_code: code });
+  const { data: classId } = await supabase.rpc("bp_find_class_by_code", { p_code: code });
   if (!classId) return { error: "We couldn't find a class with that code." };
 
-  const { error } = await supabase.from("class_members").insert({ class_id: classId, student_id: user.profile.id });
+  const { error } = await supabase.from("bp_class_members").insert({ class_id: classId, student_id: user.profile.id });
   if (error) {
     if (error.code === "23505") return { error: "You're already in this class." };
     return { error: "Couldn't join that class." };

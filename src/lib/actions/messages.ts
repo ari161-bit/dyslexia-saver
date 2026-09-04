@@ -10,7 +10,7 @@ export async function sendMessageAction(recipientId: string, content: string, pa
   if (!content.trim()) return { error: "Write something first." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("messages").insert({
+  const { error } = await supabase.from("bp_messages").insert({
     sender_id: user.profile.id,
     recipient_id: recipientId,
     content,

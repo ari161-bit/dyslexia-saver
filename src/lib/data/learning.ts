@@ -12,25 +12,25 @@ export interface LearningResourceCard {
 export async function getStudentLearningResources(studentId: string): Promise<LearningResourceCard[]> {
   const supabase = await createClient();
 
-  const { data: memberships } = await supabase.from("class_members").select("class_id").eq("student_id", studentId);
+  const { data: memberships } = await supabase.from("bp_class_members").select("class_id").eq("student_id", studentId);
   const classIds = (memberships ?? []).map((m) => m.class_id);
 
   const assigned = classIds.length
     ? await supabase
-        .from("assignments")
-        .select("resources(id, title, subject, status)")
+        .from("bp_assignments")
+        .select("bp_resources(id, title, subject, status)")
         .in("class_id", classIds)
         .not("resource_id", "is", null)
     : { data: [] };
 
   const { data: own } = await supabase
-    .from("resources")
+    .from("bp_resources")
     .select("id, title, subject, status")
     .eq("owner_id", studentId)
     .order("created_at", { ascending: false });
 
   const assignedCards: LearningResourceCard[] = (assigned.data ?? [])
-    .map((a) => a.resources as unknown as { id: string; title: string; subject: string | null; status: string } | null)
+    .map((a) => a.bp_resources as unknown as { id: string; title: string; subject: string | null; status: string } | null)
     .filter((r): r is NonNullable<typeof r> => !!r)
     .map((r) => ({ ...r, source: "assigned" as const }));
 
@@ -52,7 +52,7 @@ export async function getPracticeableResources(studentId: string): Promise<Pract
   if (readyIds.length === 0) return [];
 
   const supabase = await createClient();
-  const { data } = await supabase.from("resources").select("id, title, extracted_text").in("id", readyIds);
+  const { data } = await supabase.from("bp_resources").select("id, title, extracted_text").in("id", readyIds);
   return (data ?? [])
     .filter((r) => r.extracted_text)
     .map((r) => ({ id: r.id, title: r.title, extractedText: r.extracted_text! }));

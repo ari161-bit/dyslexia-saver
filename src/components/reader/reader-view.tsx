@@ -70,10 +70,10 @@ export function ReaderView({
   initialPreferences,
   notes,
 }: {
-  resource: Tables<"resources">;
+  resource: Tables<"bp_resources">;
   sections: ExtractedSection[];
   initialPreferences: ReadingPreferences;
-  notes: Tables<"notes">[];
+  notes: Tables<"bp_notes">[];
 }) {
   const [prefs, setPrefs] = useState(initialPreferences);
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);

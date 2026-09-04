@@ -8,7 +8,7 @@ export default async function SignupPage() {
   let schools: { id: string; name: string }[] = [];
   try {
     const supabase = await createClient();
-    const { data } = await supabase.rpc("schools_directory");
+    const { data } = await supabase.rpc("bp_schools_directory");
     schools = data ?? [];
   } catch {
     // Supabase not configured yet — the school picker will just be empty.

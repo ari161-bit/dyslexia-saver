@@ -12,8 +12,8 @@ export interface TeacherClassCard {
 export async function getTeacherClasses(teacherId: string): Promise<TeacherClassCard[]> {
   const supabase = await createClient();
   const { data } = await supabase
-    .from("classes")
-    .select("id, name, grade, subject, class_members(count)")
+    .from("bp_classes")
+    .select("id, name, grade, subject, bp_class_members(count)")
     .eq("teacher_id", teacherId)
     .order("created_at", { ascending: false });
 
@@ -22,7 +22,7 @@ export async function getTeacherClasses(teacherId: string): Promise<TeacherClass
     name: c.name,
     grade: c.grade,
     subject: c.subject,
-    studentCount: (c.class_members as unknown as { count: number }[])?.[0]?.count ?? 0,
+    studentCount: (c.bp_class_members as unknown as { count: number }[])?.[0]?.count ?? 0,
   }));
 }
 
@@ -35,7 +35,7 @@ export interface StudentNeedingAttention {
 
 export async function getStudentsNeedingAttention(teacherId: string): Promise<StudentNeedingAttention[]> {
   const supabase = await createClient();
-  const { data: classes } = await supabase.from("classes").select("id, name").eq("teacher_id", teacherId);
+  const { data: classes } = await supabase.from("bp_classes").select("id, name").eq("teacher_id", teacherId);
   const classIds = (classes ?? []).map((c) => c.id);
   if (classIds.length === 0) return [];
 
@@ -43,8 +43,8 @@ export async function getStudentsNeedingAttention(teacherId: string): Promise<St
   since.setDate(since.getDate() - 14);
 
   const { data: roster } = await supabase
-    .from("class_members")
-    .select("student_id, class_id, profiles(first_name, last_name)")
+    .from("bp_class_members")
+    .select("student_id, class_id, bp_profiles(first_name, last_name)")
     .in("class_id", classIds);
 
   const classById = new Map((classes ?? []).map((c) => [c.id, c.name]));
@@ -52,13 +52,13 @@ export async function getStudentsNeedingAttention(teacherId: string): Promise<St
 
   for (const member of roster ?? []) {
     const { count } = await supabase
-      .from("progress_events")
+      .from("bp_progress_events")
       .select("id", { count: "exact", head: true })
       .eq("student_id", member.student_id)
       .gte("created_at", since.toISOString());
 
     if ((count ?? 0) === 0) {
-      const profile = member.profiles as unknown as { first_name: string; last_name: string } | null;
+      const profile = member.bp_profiles as unknown as { first_name: string; last_name: string } | null;
       results.push({
         studentId: member.student_id,
         name: profile ? `${profile.first_name} ${profile.last_name}` : "Student",
@@ -83,22 +83,22 @@ export interface RecentAssignment {
 export async function getRecentAssignments(teacherId: string): Promise<RecentAssignment[]> {
   const supabase = await createClient();
   const { data } = await supabase
-    .from("assignments")
-    .select("id, title, due_date, classes(name, class_members(count)), submissions(status)")
+    .from("bp_assignments")
+    .select("id, title, due_date, bp_classes(name, bp_class_members(count)), bp_submissions(status)")
     .eq("teacher_id", teacherId)
     .order("created_at", { ascending: false })
     .limit(5);
 
   return (data ?? []).map((a) => {
-    const cls = a.classes as unknown as { name: string; class_members: { count: number }[] } | null;
-    const submissions = (a.submissions as unknown as { status: string }[]) ?? [];
+    const cls = a.bp_classes as unknown as { name: string; bp_class_members: { count: number }[] } | null;
+    const submissions = (a.bp_submissions as unknown as { status: string }[]) ?? [];
     return {
       id: a.id,
       title: a.title,
       className: cls?.name ?? "Class",
       dueDate: a.due_date,
       submittedCount: submissions.filter((s) => s.status === "submitted" || s.status === "reviewed").length,
-      rosterSize: cls?.class_members?.[0]?.count ?? 0,
+      rosterSize: cls?.bp_class_members?.[0]?.count ?? 0,
     };
   });
 }
@@ -111,20 +111,20 @@ export interface TeacherStudentListItem {
 
 export async function getAllTeacherStudents(teacherId: string): Promise<TeacherStudentListItem[]> {
   const supabase = await createClient();
-  const { data: classes } = await supabase.from("classes").select("id, name").eq("teacher_id", teacherId);
+  const { data: classes } = await supabase.from("bp_classes").select("id, name").eq("teacher_id", teacherId);
   const classIds = (classes ?? []).map((c) => c.id);
   if (classIds.length === 0) return [];
 
   const { data: roster } = await supabase
-    .from("class_members")
-    .select("student_id, class_id, profiles(first_name, last_name)")
+    .from("bp_class_members")
+    .select("student_id, class_id, bp_profiles(first_name, last_name)")
     .in("class_id", classIds);
 
   const classNameById = new Map((classes ?? []).map((c) => [c.id, c.name]));
   const byStudent = new Map<string, TeacherStudentListItem>();
 
   for (const r of roster ?? []) {
-    const profile = r.profiles as unknown as { first_name: string; last_name: string } | null;
+    const profile = r.bp_profiles as unknown as { first_name: string; last_name: string } | null;
     const existing = byStudent.get(r.student_id);
     const className = classNameById.get(r.class_id) ?? "Class";
     if (existing) existing.classNames.push(className);
@@ -154,15 +154,15 @@ export async function getStudentProfileForTeacher(teacherId: string, studentId: 
   if (!match) return null;
 
   const { data: activity } = await supabase
-    .from("progress_events")
+    .from("bp_progress_events")
     .select("event_type, created_at")
     .eq("student_id", studentId)
     .order("created_at", { ascending: false })
     .limit(10);
 
   const { data: pendingLinks } = await supabase
-    .from("parent_student_links")
-    .select("id, profiles!parent_student_links_parent_id_fkey(first_name, last_name)")
+    .from("bp_parent_student_links")
+    .select("id, bp_profiles!bp_parent_student_links_parent_id_fkey(first_name, last_name)")
     .eq("student_id", studentId)
     .eq("status", "pending");
 
@@ -170,7 +170,7 @@ export async function getStudentProfileForTeacher(teacherId: string, studentId: 
     ...match,
     recentActivity: (activity ?? []).map((a) => ({ eventType: a.event_type, createdAt: a.created_at })),
     pendingParentLinks: (pendingLinks ?? []).map((p) => {
-      const profile = p.profiles as unknown as { first_name: string; last_name: string } | null;
+      const profile = p.bp_profiles as unknown as { first_name: string; last_name: string } | null;
       return { id: p.id, parentName: profile ? `${profile.first_name} ${profile.last_name}` : "Parent" };
     }),
   };
@@ -188,16 +188,16 @@ export interface ClassDetail {
 
 export async function getClassDetail(classId: string): Promise<ClassDetail | null> {
   const supabase = await createClient();
-  const { data: cls } = await supabase.from("classes").select("*").eq("id", classId).maybeSingle();
+  const { data: cls } = await supabase.from("bp_classes").select("*").eq("id", classId).maybeSingle();
   if (!cls) return null;
 
   const { data: roster } = await supabase
-    .from("class_members")
-    .select("student_id, profiles(first_name, last_name)")
+    .from("bp_class_members")
+    .select("student_id, bp_profiles(first_name, last_name)")
     .eq("class_id", classId);
 
   const { data: assignments } = await supabase
-    .from("assignments")
+    .from("bp_assignments")
     .select("id, title, due_date")
     .eq("class_id", classId)
     .order("due_date", { ascending: true });
@@ -209,7 +209,7 @@ export async function getClassDetail(classId: string): Promise<ClassDetail | nul
     subject: cls.subject,
     joinCode: cls.join_code,
     roster: (roster ?? []).map((r) => {
-      const profile = r.profiles as unknown as { first_name: string; last_name: string } | null;
+      const profile = r.bp_profiles as unknown as { first_name: string; last_name: string } | null;
       return { studentId: r.student_id, name: profile ? `${profile.first_name} ${profile.last_name}` : "Student" };
     }),
     assignments: (assignments ?? []).map((a) => ({ id: a.id, title: a.title, dueDate: a.due_date })),
@@ -225,17 +225,17 @@ export interface ClassProgressSummary {
 
 export async function getClassProgressSummaries(teacherId: string): Promise<ClassProgressSummary[]> {
   const supabase = await createClient();
-  const { data: classes } = await supabase.from("classes").select("id, name, class_members(student_id)").eq("teacher_id", teacherId);
+  const { data: classes } = await supabase.from("bp_classes").select("id, name, bp_class_members(student_id)").eq("teacher_id", teacherId);
   const since = new Date();
   since.setDate(since.getDate() - 7);
 
   const summaries: ClassProgressSummary[] = [];
   for (const c of classes ?? []) {
-    const studentIds = (c.class_members as unknown as { student_id: string }[]).map((m) => m.student_id);
+    const studentIds = (c.bp_class_members as unknown as { student_id: string }[]).map((m) => m.student_id);
     let activities = 0;
     if (studentIds.length > 0) {
       const { count } = await supabase
-        .from("progress_events")
+        .from("bp_progress_events")
         .select("id", { count: "exact", head: true })
         .in("student_id", studentIds)
         .gte("created_at", since.toISOString());
@@ -249,21 +249,21 @@ export async function getClassProgressSummaries(teacherId: string): Promise<Clas
 export async function getAllTeacherAssignments(teacherId: string): Promise<RecentAssignment[]> {
   const supabase = await createClient();
   const { data } = await supabase
-    .from("assignments")
-    .select("id, title, due_date, classes(name, class_members(count)), submissions(status)")
+    .from("bp_assignments")
+    .select("id, title, due_date, bp_classes(name, bp_class_members(count)), bp_submissions(status)")
     .eq("teacher_id", teacherId)
     .order("due_date", { ascending: true });
 
   return (data ?? []).map((a) => {
-    const cls = a.classes as unknown as { name: string; class_members: { count: number }[] } | null;
-    const submissions = (a.submissions as unknown as { status: string }[]) ?? [];
+    const cls = a.bp_classes as unknown as { name: string; bp_class_members: { count: number }[] } | null;
+    const submissions = (a.bp_submissions as unknown as { status: string }[]) ?? [];
     return {
       id: a.id,
       title: a.title,
       className: cls?.name ?? "Class",
       dueDate: a.due_date,
       submittedCount: submissions.filter((s) => s.status === "submitted" || s.status === "reviewed").length,
-      rosterSize: cls?.class_members?.[0]?.count ?? 0,
+      rosterSize: cls?.bp_class_members?.[0]?.count ?? 0,
     };
   });
 }
@@ -279,7 +279,7 @@ export interface RecentResource {
 export async function getRecentResources(teacherId: string): Promise<RecentResource[]> {
   const supabase = await createClient();
   const { data } = await supabase
-    .from("resources")
+    .from("bp_resources")
     .select("id, title, subject, status, created_at")
     .eq("owner_id", teacherId)
     .order("created_at", { ascending: false })

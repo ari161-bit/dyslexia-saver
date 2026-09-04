@@ -114,7 +114,7 @@ async function provisionProfile(
   const supabase = await createClient();
 
   const { data: existing } = await supabase
-    .from("profiles")
+    .from("bp_profiles")
     .select("id")
     .eq("auth_user_id", authUserId)
     .maybeSingle();
@@ -123,7 +123,7 @@ async function provisionProfile(
 
   if (!profileId) {
     const { data: profile, error } = await supabase
-      .from("profiles")
+      .from("bp_profiles")
       .insert({
         auth_user_id: authUserId,
         role: opts.role,
@@ -139,13 +139,13 @@ async function provisionProfile(
 
   if (opts.role === "school_admin" && opts.schoolName) {
     const { data: schoolExists } = await supabase
-      .from("schools")
+      .from("bp_schools")
       .select("id")
       .ilike("name", opts.schoolName)
       .maybeSingle();
 
     if (schoolExists) {
-      await supabase.from("school_members").insert({
+      await supabase.from("bp_school_members").insert({
         school_id: schoolExists.id,
         user_id: profileId,
         role: "school_admin",
@@ -153,12 +153,12 @@ async function provisionProfile(
       });
     } else {
       const { data: newSchool } = await supabase
-        .from("schools")
+        .from("bp_schools")
         .insert({ name: opts.schoolName })
         .select("id")
         .single();
       if (newSchool) {
-        await supabase.from("school_members").insert({
+        await supabase.from("bp_school_members").insert({
           school_id: newSchool.id,
           user_id: profileId,
           role: "school_admin",
@@ -169,7 +169,7 @@ async function provisionProfile(
   }
 
   if (opts.role === "teacher" && opts.schoolId) {
-    await supabase.from("school_members").insert({
+    await supabase.from("bp_school_members").insert({
       school_id: opts.schoolId,
       user_id: profileId,
       role: "teacher",

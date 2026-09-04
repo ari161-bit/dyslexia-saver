@@ -13,19 +13,19 @@ export interface StudentAssignmentListItem {
 
 export async function getStudentAssignments(studentId: string): Promise<StudentAssignmentListItem[]> {
   const supabase = await createClient();
-  const { data: memberships } = await supabase.from("class_members").select("class_id").eq("student_id", studentId);
+  const { data: memberships } = await supabase.from("bp_class_members").select("class_id").eq("student_id", studentId);
   const classIds = (memberships ?? []).map((m) => m.class_id);
   if (classIds.length === 0) return [];
 
   const { data } = await supabase
-    .from("assignments")
-    .select("id, title, subject, due_date, classes(name), submissions(status, student_id)")
+    .from("bp_assignments")
+    .select("id, title, subject, due_date, bp_classes(name), bp_submissions(status, student_id)")
     .in("class_id", classIds)
     .order("due_date", { ascending: true });
 
   return (data ?? []).map((a) => {
-    const cls = a.classes as unknown as { name: string } | null;
-    const submissions = (a.submissions as unknown as { status: string; student_id: string }[]) ?? [];
+    const cls = a.bp_classes as unknown as { name: string } | null;
+    const submissions = (a.bp_submissions as unknown as { status: string; student_id: string }[]) ?? [];
     const mine = submissions.find((s) => s.student_id === studentId);
     return {
       id: a.id,
@@ -39,30 +39,30 @@ export async function getStudentAssignments(studentId: string): Promise<StudentA
 }
 
 export interface AssignmentDetail {
-  assignment: Tables<"assignments">;
+  assignment: Tables<"bp_assignments">;
   className: string;
-  resource: Tables<"resources"> | null;
-  submission: Tables<"submissions"> | null;
+  resource: Tables<"bp_resources"> | null;
+  submission: Tables<"bp_submissions"> | null;
 }
 
 export async function getAssignmentDetail(assignmentId: string, studentId: string): Promise<AssignmentDetail | null> {
   const supabase = await createClient();
   const { data: assignment } = await supabase
-    .from("assignments")
-    .select("*, classes(name), resources(*)")
+    .from("bp_assignments")
+    .select("*, bp_classes(name), bp_resources(*)")
     .eq("id", assignmentId)
     .maybeSingle();
   if (!assignment) return null;
 
   const { data: submission } = await supabase
-    .from("submissions")
+    .from("bp_submissions")
     .select("*")
     .eq("assignment_id", assignmentId)
     .eq("student_id", studentId)
     .maybeSingle();
 
-  const cls = assignment.classes as unknown as { name: string } | null;
-  const resource = assignment.resources as unknown as Tables<"resources"> | null;
+  const cls = assignment.bp_classes as unknown as { name: string } | null;
+  const resource = assignment.bp_resources as unknown as Tables<"bp_resources"> | null;
 
   return {
     assignment,
@@ -73,28 +73,28 @@ export async function getAssignmentDetail(assignmentId: string, studentId: strin
 }
 
 export interface TeacherAssignmentSubmissions {
-  assignment: Tables<"assignments">;
+  assignment: Tables<"bp_assignments">;
   className: string;
-  submissions: (Tables<"submissions"> & { studentName: string })[];
+  submissions: (Tables<"bp_submissions"> & { studentName: string })[];
   rosterSize: number;
 }
 
 export async function getAssignmentSubmissions(assignmentId: string): Promise<TeacherAssignmentSubmissions | null> {
   const supabase = await createClient();
   const { data: assignment } = await supabase
-    .from("assignments")
-    .select("*, classes(name)")
+    .from("bp_assignments")
+    .select("*, bp_classes(name)")
     .eq("id", assignmentId)
     .maybeSingle();
   if (!assignment) return null;
 
-  const { data: roster } = await supabase.from("class_members").select("student_id, profiles(first_name, last_name)").eq("class_id", assignment.class_id);
-  const { data: submissions } = await supabase.from("submissions").select("*").eq("assignment_id", assignmentId);
+  const { data: roster } = await supabase.from("bp_class_members").select("student_id, bp_profiles(first_name, last_name)").eq("class_id", assignment.class_id);
+  const { data: submissions } = await supabase.from("bp_submissions").select("*").eq("assignment_id", assignmentId);
 
   const submissionByStudent = new Map((submissions ?? []).map((s) => [s.student_id, s]));
 
   const combined = (roster ?? []).map((r) => {
-    const profile = r.profiles as unknown as { first_name: string; last_name: string } | null;
+    const profile = r.bp_profiles as unknown as { first_name: string; last_name: string } | null;
     const existing = submissionByStudent.get(r.student_id);
     return (
       existing ?? {
@@ -110,12 +110,12 @@ export async function getAssignmentSubmissions(assignmentId: string): Promise<Te
   }).map((s, i) => ({
     ...s,
     studentName: (() => {
-      const profile = (roster ?? [])[i]?.profiles as unknown as { first_name: string; last_name: string } | null;
+      const profile = (roster ?? [])[i]?.bp_profiles as unknown as { first_name: string; last_name: string } | null;
       return profile ? `${profile.first_name} ${profile.last_name}` : "Student";
     })(),
   }));
 
-  const cls = assignment.classes as unknown as { name: string } | null;
+  const cls = assignment.bp_classes as unknown as { name: string } | null;
 
   return {
     assignment,

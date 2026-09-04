@@ -18,10 +18,10 @@ export async function requestChildLinkAction(_prev: LinkActionResult, formData: 
   if (!code) return { error: "Enter your child's student code." };
 
   const supabase = await createClient();
-  const { data: studentId } = await supabase.rpc("find_student_by_code", { p_code: code });
+  const { data: studentId } = await supabase.rpc("bp_find_student_by_code", { p_code: code });
   if (!studentId) return { error: "We couldn't find a student with that code." };
 
-  const { error } = await supabase.from("parent_student_links").insert({
+  const { error } = await supabase.from("bp_parent_student_links").insert({
     parent_id: user.profile.id,
     student_id: studentId,
     relationship: relationship || null,
@@ -43,7 +43,7 @@ export async function respondToLinkRequestAction(linkId: string, approve: boolea
 
   const supabase = await createClient();
   const { error } = await supabase
-    .from("parent_student_links")
+    .from("bp_parent_student_links")
     .update({ status: approve ? "approved" : "rejected" })
     .eq("id", linkId);
 

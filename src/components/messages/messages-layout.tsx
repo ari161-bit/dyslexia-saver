@@ -21,7 +21,7 @@ export function MessagesLayout({
   previews: ConversationPreview[];
   selectedContactId?: string;
   selectedContactName?: string;
-  thread: Tables<"messages">[];
+  thread: Tables<"bp_messages">[];
   profileId: string;
 }) {
   const previewByContact = new Map(previews.map((p) => [p.contactId, p]));

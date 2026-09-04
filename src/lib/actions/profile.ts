@@ -22,7 +22,7 @@ export async function updateProfileAction(
 
   const supabase = await createClient();
   const { error } = await supabase
-    .from("profiles")
+    .from("bp_profiles")
     .update({ first_name: firstName, last_name: lastName })
     .eq("id", user.profile.id);
 

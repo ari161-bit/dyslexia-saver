@@ -11,7 +11,7 @@ export async function updateReadingPreferencesAction(patch: Partial<ReadingPrefe
 
   const supabase = await createClient();
   const { error } = await supabase
-    .from("reading_preferences")
+    .from("bp_reading_preferences")
     .upsert({ user_id: user.profile.id, ...patch, updated_at: new Date().toISOString() });
 
   if (error) return { error: "Couldn't save your preferences." };

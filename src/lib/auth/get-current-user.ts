@@ -2,7 +2,7 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/lib/types/database";
 
-export type CurrentProfile = Tables<"profiles">;
+export type CurrentProfile = Tables<"bp_profiles">;
 
 export async function getCurrentUser(): Promise<{
   authUserId: string;
@@ -16,7 +16,7 @@ export async function getCurrentUser(): Promise<{
   if (!user) return null;
 
   const { data: profile } = await supabase
-    .from("profiles")
+    .from("bp_profiles")
     .select("*")
     .eq("auth_user_id", user.id)
     .maybeSingle();
@@ -27,8 +27,8 @@ export async function getCurrentUser(): Promise<{
 export async function getSchoolMembership(profileId: string) {
   const supabase = await createClient();
   const { data } = await supabase
-    .from("school_members")
-    .select("*, schools(name)")
+    .from("bp_school_members")
+    .select("*, bp_schools(name)")
     .eq("user_id", profileId)
     .maybeSingle();
   return data;

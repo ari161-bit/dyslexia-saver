@@ -21,7 +21,7 @@ export async function updateSchoolNameAction(
   if (!name) return { error: "School name can't be empty." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("schools").update({ name }).eq("id", schoolId);
+  const { error } = await supabase.from("bp_schools").update({ name }).eq("id", schoolId);
   if (error) return { error: "Couldn't update the school name." };
 
   revalidatePath("/school", "layout");

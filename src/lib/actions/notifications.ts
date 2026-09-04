@@ -9,7 +9,7 @@ export async function markAllNotificationsReadAction() {
   if (!user?.profile) return;
 
   const supabase = await createClient();
-  await supabase.from("notifications").update({ read: true }).eq("user_id", user.profile.id).eq("read", false);
+  await supabase.from("bp_notifications").update({ read: true }).eq("user_id", user.profile.id).eq("read", false);
 
   revalidatePath("/notifications");
 }

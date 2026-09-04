@@ -1,6 +1,9 @@
-// Hand-written to match supabase/migrations/0001_schema.sql.
+// Hand-written to match supabase/combined_all.sql (or supabase/migrations/*.sql).
 // Regenerate with `npx supabase gen types typescript` once the project is linked,
 // then reconcile any drift with this file.
+//
+// Every table/type/function is prefixed with `bp_` so this app can coexist in a
+// shared Supabase project alongside other apps without name collisions.
 
 export type UserRole = "student" | "parent" | "teacher" | "school_admin";
 export type MembershipStatus = "pending" | "approved" | "rejected";
@@ -19,7 +22,7 @@ export type HighlightMode = "none" | "paragraph" | "sentence" | "word";
 export interface Database {
   public: {
     Tables: {
-      profiles: {
+      bp_profiles: {
         Row: {
           id: string;
           auth_user_id: string;
@@ -40,16 +43,16 @@ export interface Database {
           student_code?: string | null;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_profiles"]["Insert"]>;
         Relationships: [];
       };
-      schools: {
+      bp_schools: {
         Row: { id: string; name: string; logo_url: string | null; created_at: string };
         Insert: { id?: string; name: string; logo_url?: string | null; created_at?: string };
-        Update: Partial<Database["public"]["Tables"]["schools"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_schools"]["Insert"]>;
         Relationships: [];
       };
-      school_members: {
+      bp_school_members: {
         Row: {
           id: string;
           school_id: string;
@@ -66,10 +69,10 @@ export interface Database {
           status?: MembershipStatus;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["school_members"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_school_members"]["Insert"]>;
         Relationships: [];
       };
-      classes: {
+      bp_classes: {
         Row: {
           id: string;
           school_id: string;
@@ -90,16 +93,16 @@ export interface Database {
           join_code?: string;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["classes"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_classes"]["Insert"]>;
         Relationships: [];
       };
-      class_members: {
+      bp_class_members: {
         Row: { id: string; class_id: string; student_id: string; created_at: string };
         Insert: { id?: string; class_id: string; student_id: string; created_at?: string };
-        Update: Partial<Database["public"]["Tables"]["class_members"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_class_members"]["Insert"]>;
         Relationships: [];
       };
-      parent_student_links: {
+      bp_parent_student_links: {
         Row: {
           id: string;
           parent_id: string;
@@ -116,10 +119,10 @@ export interface Database {
           status?: MembershipStatus;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["parent_student_links"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_parent_student_links"]["Insert"]>;
         Relationships: [];
       };
-      resources: {
+      bp_resources: {
         Row: {
           id: string;
           owner_id: string;
@@ -150,10 +153,10 @@ export interface Database {
           is_seed?: boolean;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["resources"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_resources"]["Insert"]>;
         Relationships: [];
       };
-      resource_adaptations: {
+      bp_resource_adaptations: {
         Row: {
           id: string;
           resource_id: string;
@@ -172,10 +175,10 @@ export interface Database {
           approved?: boolean;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["resource_adaptations"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_resource_adaptations"]["Insert"]>;
         Relationships: [];
       };
-      assignments: {
+      bp_assignments: {
         Row: {
           id: string;
           teacher_id: string;
@@ -202,10 +205,10 @@ export interface Database {
           due_date?: string | null;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["assignments"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_assignments"]["Insert"]>;
         Relationships: [];
       };
-      submissions: {
+      bp_submissions: {
         Row: {
           id: string;
           assignment_id: string;
@@ -224,10 +227,10 @@ export interface Database {
           submitted_at?: string | null;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["submissions"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_submissions"]["Insert"]>;
         Relationships: [];
       };
-      reading_preferences: {
+      bp_reading_preferences: {
         Row: {
           user_id: string;
           font_size: number;
@@ -242,13 +245,13 @@ export interface Database {
           dyslexia_font: boolean;
           updated_at: string;
         };
-        Insert: Partial<Database["public"]["Tables"]["reading_preferences"]["Row"]> & {
+        Insert: Partial<Database["public"]["Tables"]["bp_reading_preferences"]["Row"]> & {
           user_id: string;
         };
-        Update: Partial<Database["public"]["Tables"]["reading_preferences"]["Row"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_reading_preferences"]["Row"]>;
         Relationships: [];
       };
-      notes: {
+      bp_notes: {
         Row: {
           id: string;
           user_id: string;
@@ -265,10 +268,10 @@ export interface Database {
           position?: unknown;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["notes"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_notes"]["Insert"]>;
         Relationships: [];
       };
-      progress_events: {
+      bp_progress_events: {
         Row: {
           id: string;
           student_id: string;
@@ -285,10 +288,10 @@ export interface Database {
           metadata?: unknown;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["progress_events"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_progress_events"]["Insert"]>;
         Relationships: [];
       };
-      messages: {
+      bp_messages: {
         Row: {
           id: string;
           sender_id: string;
@@ -307,10 +310,10 @@ export interface Database {
           created_at?: string;
           read_at?: string | null;
         };
-        Update: Partial<Database["public"]["Tables"]["messages"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_messages"]["Insert"]>;
         Relationships: [];
       };
-      notifications: {
+      bp_notifications: {
         Row: {
           id: string;
           user_id: string;
@@ -329,29 +332,29 @@ export interface Database {
           read?: boolean;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["notifications"]["Insert"]>;
+        Update: Partial<Database["public"]["Tables"]["bp_notifications"]["Insert"]>;
         Relationships: [];
       };
     };
     Views: Record<string, never>;
     Functions: {
-      schools_directory: {
+      bp_schools_directory: {
         Args: Record<string, never>;
         Returns: { id: string; name: string }[];
       };
-      my_profile_id: {
+      bp_my_profile_id: {
         Args: Record<string, never>;
         Returns: string;
       };
-      find_class_by_code: {
+      bp_find_class_by_code: {
         Args: { p_code: string };
         Returns: string;
       };
-      find_student_by_code: {
+      bp_find_student_by_code: {
         Args: { p_code: string };
         Returns: string;
       };
-      create_school_announcement: {
+      bp_create_school_announcement: {
         Args: { p_school_id: string; p_title: string; p_body: string | null };
         Returns: undefined;
       };

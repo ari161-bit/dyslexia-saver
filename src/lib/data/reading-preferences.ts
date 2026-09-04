@@ -2,7 +2,7 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/lib/types/database";
 
-export type ReadingPreferences = Tables<"reading_preferences">;
+export type ReadingPreferences = Tables<"bp_reading_preferences">;
 
 export const DEFAULT_READING_PREFERENCES: Omit<ReadingPreferences, "user_id" | "updated_at"> = {
   font_size: 19,
@@ -19,7 +19,7 @@ export const DEFAULT_READING_PREFERENCES: Omit<ReadingPreferences, "user_id" | "
 
 export async function getReadingPreferences(userId: string): Promise<ReadingPreferences> {
   const supabase = await createClient();
-  const { data } = await supabase.from("reading_preferences").select("*").eq("user_id", userId).maybeSingle();
+  const { data } = await supabase.from("bp_reading_preferences").select("*").eq("user_id", userId).maybeSingle();
   if (data) return data;
   return { user_id: userId, updated_at: new Date().toISOString(), ...DEFAULT_READING_PREFERENCES };
 }

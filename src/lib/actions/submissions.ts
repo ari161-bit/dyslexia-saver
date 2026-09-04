@@ -13,7 +13,7 @@ export async function saveSubmissionAction(
   if (!user?.profile) return { error: "Please sign in." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("submissions").upsert(
+  const { error } = await supabase.from("bp_submissions").upsert(
     {
       assignment_id: assignmentId,
       student_id: user.profile.id,

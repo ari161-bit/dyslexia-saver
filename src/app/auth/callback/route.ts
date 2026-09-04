@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
     if (!error && data.user) {
       const { data: existing } = await supabase
-        .from("profiles")
+        .from("bp_profiles")
         .select("id, role")
         .eq("auth_user_id", data.user.id)
         .maybeSingle();
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
         };
         const role = meta.role ?? "student";
         const { data: profile } = await supabase
-          .from("profiles")
+          .from("bp_profiles")
           .insert({
             auth_user_id: data.user.id,
             role,
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
           .single();
 
         if (profile && role === "teacher" && meta.school_id) {
-          await supabase.from("school_members").insert({
+          await supabase.from("bp_school_members").insert({
             school_id: meta.school_id,
             user_id: profile.id,
             role: "teacher",
@@ -49,12 +49,12 @@ export async function GET(request: NextRequest) {
         }
         if (profile && role === "school_admin" && meta.school_name) {
           const { data: schoolExists } = await supabase
-            .from("schools")
+            .from("bp_schools")
             .select("id")
             .ilike("name", meta.school_name)
             .maybeSingle();
           if (schoolExists) {
-            await supabase.from("school_members").insert({
+            await supabase.from("bp_school_members").insert({
               school_id: schoolExists.id,
               user_id: profile.id,
               role: "school_admin",
@@ -62,12 +62,12 @@ export async function GET(request: NextRequest) {
             });
           } else {
             const { data: newSchool } = await supabase
-              .from("schools")
+              .from("bp_schools")
               .insert({ name: meta.school_name })
               .select("id")
               .single();
             if (newSchool) {
-              await supabase.from("school_members").insert({
+              await supabase.from("bp_school_members").insert({
                 school_id: newSchool.id,
                 user_id: profile.id,
                 role: "school_admin",

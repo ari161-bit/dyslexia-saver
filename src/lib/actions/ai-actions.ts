@@ -76,7 +76,7 @@ export async function saveNoteAction(resourceId: string, content: string, positi
   if (!content.trim()) return { error: "Write something before saving." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("notes").insert({
+  const { error } = await supabase.from("bp_notes").insert({
     user_id: user.profile.id,
     resource_id: resourceId,
     content,

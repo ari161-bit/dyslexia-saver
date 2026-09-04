@@ -27,15 +27,15 @@ export async function uploadResourceAction(_prev: UploadResult, formData: FormDa
   const supabase = await createClient();
   const path = `${user.profile.id}/${crypto.randomUUID()}-${file.name}`;
 
-  const { error: uploadError } = await supabase.storage.from("resources").upload(path, file, {
+  const { error: uploadError } = await supabase.storage.from("bp_resources").upload(path, file, {
     contentType: file.type || "application/octet-stream",
   });
   if (uploadError) return { error: "Upload failed. Please try again." };
 
-  const { data: fileUrl } = supabase.storage.from("resources").getPublicUrl(path);
+  const { data: fileUrl } = supabase.storage.from("bp_resources").getPublicUrl(path);
 
   const { data: resource, error: insertError } = await supabase
-    .from("resources")
+    .from("bp_resources")
     .insert({
       owner_id: user.profile.id,
       title: title || file.name.replace(/\.[^.]+$/, ""),
@@ -54,7 +54,7 @@ export async function uploadResourceAction(_prev: UploadResult, formData: FormDa
     const extracted = await ai.extractContent({ text: rawText, fileType: file.type });
 
     await supabase
-      .from("resources")
+      .from("bp_resources")
       .update({
         title: title || extracted.title,
         extracted_text: extracted.rawText || "This file type needs OCR to extract text — connect a real OCR/vision provider in src/lib/ai/service.ts to read PDFs, DOCX, and photos automatically. For now, paste or type the content of this resource to unlock adaptations.",
@@ -63,7 +63,7 @@ export async function uploadResourceAction(_prev: UploadResult, formData: FormDa
       })
       .eq("id", resource.id);
   } catch {
-    await supabase.from("resources").update({ status: "failed" }).eq("id", resource.id);
+    await supabase.from("bp_resources").update({ status: "failed" }).eq("id", resource.id);
   }
 
   revalidatePath("/teacher/resources");
