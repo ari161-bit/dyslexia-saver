@@ -18,6 +18,7 @@ export type AdaptationType =
   | "revision";
 export type SubmissionStatus = "not_started" | "in_progress" | "submitted" | "reviewed";
 export type HighlightMode = "none" | "paragraph" | "sentence" | "word";
+export type InviteStatus = "pending" | "accepted" | "expired" | "revoked";
 
 export interface Database {
   public: {
@@ -100,6 +101,36 @@ export interface Database {
         Row: { id: string; class_id: string; student_id: string; created_at: string };
         Insert: { id?: string; class_id: string; student_id: string; created_at?: string };
         Update: Partial<Database["public"]["Tables"]["bp_class_members"]["Insert"]>;
+        Relationships: [];
+      };
+      bp_invites: {
+        Row: {
+          id: string;
+          token: string;
+          school_id: string;
+          class_id: string | null;
+          inviter_id: string;
+          email: string;
+          role: UserRole;
+          status: InviteStatus;
+          created_at: string;
+          expires_at: string;
+          accepted_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          token?: string;
+          school_id: string;
+          class_id?: string | null;
+          inviter_id: string;
+          email: string;
+          role: UserRole;
+          status?: InviteStatus;
+          created_at?: string;
+          expires_at?: string;
+          accepted_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["bp_invites"]["Insert"]>;
         Relationships: [];
       };
       bp_parent_student_links: {
@@ -356,6 +387,23 @@ export interface Database {
       };
       bp_create_school_announcement: {
         Args: { p_school_id: string; p_title: string; p_body: string | null };
+        Returns: undefined;
+      };
+      bp_get_invite_by_token: {
+        Args: { p_token: string };
+        Returns: {
+          email: string;
+          role: UserRole;
+          school_id: string;
+          school_name: string;
+          class_id: string | null;
+          class_name: string | null;
+          status: InviteStatus;
+          expires_at: string;
+        }[];
+      };
+      bp_accept_invite: {
+        Args: { p_token: string };
         Returns: undefined;
       };
     };

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { TeacherRequestActions } from "@/components/school/teacher-request-actions";
+import { InviteTeacherDialog } from "@/components/school/invite-teacher-dialog";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { getSchoolForAdmin, getSchoolTeachers } from "@/lib/data/school";
 
@@ -16,7 +17,7 @@ export default async function SchoolTeachersPage() {
 
   return (
     <div>
-      <PageHeader title="Teachers" description="Approve new teacher accounts and manage staff." />
+      <PageHeader title="Teachers" description="Approve new teacher accounts and manage staff." action={<InviteTeacherDialog />} />
       {teachers.length === 0 ? (
         <EmptyState icon={GraduationCap} title="No teachers yet" description="Teachers who select your school at signup will appear here." />
       ) : (

@@ -69,6 +69,7 @@ export async function signUpAction(_prev: ActionResult, formData: FormData): Pro
 export async function signInAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
+  const next = String(formData.get("next") ?? "").trim();
 
   if (!email || !password) return { error: "Enter your email and password." };
 
@@ -76,7 +77,11 @@ export async function signInAction(_prev: ActionResult, formData: FormData): Pro
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: "Incorrect email or password." };
 
-  redirect("/redirect-home");
+  // Only ever redirect to a same-site path (starts with a single "/", never
+  // "//" which browsers treat as protocol-relative to another host) — next
+  // comes from a query param an attacker could craft, so an open redirect
+  // here would be a real phishing vector.
+  redirect(next.startsWith("/") && !next.startsWith("//") ? next : "/redirect-home");
 }
 
 export async function signOutAction() {
