@@ -1,5 +1,6 @@
 import "server-only";
 import { MockAIProvider } from "./mock-provider";
+import { GroqAIProvider } from "./groq-provider";
 import { AIServiceError, type AIService } from "./types";
 
 const BLOCKED_PATTERNS = [/\bself[- ]harm\b/i, /\bhow to (make|build) a (bomb|weapon)\b/i];
@@ -13,6 +14,8 @@ function moderate(text: string) {
 function getProvider(): AIService {
   const providerName = process.env.AI_PROVIDER ?? "mock";
   switch (providerName) {
+    case "groq":
+      return new GroqAIProvider();
     case "mock":
     default:
       return new MockAIProvider();
