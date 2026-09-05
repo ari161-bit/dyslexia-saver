@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { CopyCodeButton } from "@/components/classes/copy-code-button";
+import { InviteStudentDialog } from "@/components/classes/invite-student-dialog";
 import { getClassDetail } from "@/lib/data/teacher";
 
 export default async function TeacherClassDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -35,7 +36,10 @@ export default async function TeacherClassDetailPage({ params }: { params: Promi
             <p className="mt-1 font-mono text-2xl font-semibold tracking-widest">{detail.joinCode}</p>
             <p className="mt-1 text-xs text-muted-foreground">Share this with students so they can join the class themselves.</p>
           </div>
-          <CopyCodeButton code={detail.joinCode} />
+          <div className="flex items-center gap-2">
+            <CopyCodeButton code={detail.joinCode} />
+            <InviteStudentDialog classId={detail.id} />
+          </div>
         </CardContent>
       </Card>
 

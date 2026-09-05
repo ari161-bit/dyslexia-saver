@@ -7,6 +7,9 @@ function isPublicPath(pathname: string) {
   if (PUBLIC_PATHS.includes(pathname)) return true;
   if (pathname.startsWith("/_next") || pathname.startsWith("/api/public")) return true;
   if (pathname === "/manifest.json" || pathname === "/sw.js" || pathname.startsWith("/.well-known/")) return true;
+  // Invite links are usually opened by someone who doesn't have an account
+  // yet — the page itself checks the token server-side, so no auth gate here.
+  if (pathname.startsWith("/invite/")) return true;
   return false;
 }
 
