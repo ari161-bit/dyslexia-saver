@@ -12,7 +12,10 @@ function moderate(text: string) {
 }
 
 function getProvider(): AIService {
-  const providerName = (process.env.AI_PROVIDER ?? "mock").trim().toLowerCase();
+  const providerName = (process.env.AI_PROVIDER ?? "mock")
+    .trim()
+    .replace(/^["']|["']$/g, "")
+    .toLowerCase();
   switch (providerName) {
     case "groq":
       return new GroqAIProvider();

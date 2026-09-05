@@ -7,6 +7,7 @@ function isPublicPath(pathname: string) {
   if (PUBLIC_PATHS.includes(pathname)) return true;
   if (pathname.startsWith("/_next") || pathname.startsWith("/api/public")) return true;
   if (pathname === "/manifest.json" || pathname === "/sw.js" || pathname.startsWith("/.well-known/")) return true;
+  if (pathname === "/api/debug-ai-config") return true;
   return false;
 }
 
