@@ -52,7 +52,14 @@ export async function signUpAction(_prev: ActionResult, formData: FormData): Pro
   if (!data.user) return { error: "Something went wrong creating your account." };
 
   if (data.session) {
-    await provisionProfile(data.user.id, { firstName, lastName, role, schoolName, schoolId });
+    try {
+      await provisionProfile(data.user.id, { firstName, lastName, role, schoolName, schoolId });
+    } catch (err) {
+      console.error("provisionProfile failed during signup", err);
+      return {
+        error: "Your account was created, but we couldn't finish setting it up. Please try logging in — if that doesn't work, contact support.",
+      };
+    }
     redirect(ROLE_HOME[role]);
   }
 

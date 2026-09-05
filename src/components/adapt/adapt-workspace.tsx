@@ -26,11 +26,13 @@ export function AdaptWorkspace({
 
   return (
     <Tabs defaultValue="accessible">
-      <TabsList className="flex-wrap">
-        {TYPES.map((t) => (
-          <TabsTrigger key={t.type} value={t.type}>{t.label}</TabsTrigger>
-        ))}
-      </TabsList>
+      <div className="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:overflow-visible sm:px-0">
+        <TabsList className="w-max min-w-full sm:w-fit">
+          {TYPES.map((t) => (
+            <TabsTrigger key={t.type} value={t.type} className="shrink-0">{t.label}</TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
       {TYPES.map((t) => (
         <TabsContent key={t.type} value={t.type} className="pt-5">
           <AdaptationPanel
