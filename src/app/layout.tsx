@@ -3,6 +3,7 @@ import { Lexend, Atkinson_Hyperlegible_Next, Geist_Mono } from "next/font/google
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
+import { ServiceWorkerRegister } from "@/components/service-worker-register";
 import "./globals.css";
 
 const lexend = Lexend({
@@ -30,6 +31,19 @@ export const metadata: Metadata = {
   },
   description:
     "An intelligent learning support platform helping students, teachers, parents and schools create a more accessible learning experience.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Brightpath",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export const viewport: Viewport = {
@@ -56,6 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <TooltipProvider delayDuration={200}>
             {children}
             <Toaster position="top-center" richColors closeButton />
+            <ServiceWorkerRegister />
           </TooltipProvider>
         </ThemeProvider>
       </body>

@@ -1,11 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/", "/login", "/signup", "/forgot-password", "/reset-password", "/verify-email", "/how-it-works", "/auth/callback"];
+const PUBLIC_PATHS = ["/", "/login", "/signup", "/forgot-password", "/reset-password", "/verify-email", "/how-it-works", "/auth/callback", "/privacy", "/offline"];
 
 function isPublicPath(pathname: string) {
   if (PUBLIC_PATHS.includes(pathname)) return true;
   if (pathname.startsWith("/_next") || pathname.startsWith("/api/public")) return true;
+  if (pathname === "/manifest.json" || pathname === "/sw.js" || pathname.startsWith("/.well-known/")) return true;
   return false;
 }
 

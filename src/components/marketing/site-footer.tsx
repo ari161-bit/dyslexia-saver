@@ -37,7 +37,7 @@ export function SiteFooter() {
             <div>
               <p className="text-sm font-semibold">Trust</p>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li>Privacy-first for minors</li>
+                <li><Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link></li>
                 <li>Human-reviewed AI content</li>
                 <li>No public student data</li>
               </ul>
