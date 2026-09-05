@@ -51,6 +51,13 @@ create policy "bp_profiles: school admin sees school members" on bp_profiles for
 create policy "bp_schools: members can view" on bp_schools for select
   using (id in (select bp_my_school_ids()));
 
+-- Any authenticated user can propose a brand-new school (equivalent to starting a
+-- new workspace); joining an *existing* school as staff still requires approval
+-- via bp_school_members.status, enforced in application code (see auth actions).
+create policy "bp_schools: authenticated users can create" on bp_schools for insert
+  to authenticated
+  with check (true);
+
 create policy "bp_schools: admin can update" on bp_schools for update
   using (bp_is_school_admin(id));
 

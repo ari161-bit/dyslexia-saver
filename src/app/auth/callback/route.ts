@@ -61,18 +61,20 @@ export async function GET(request: NextRequest) {
               status: "pending",
             });
           } else {
-            const { data: newSchool } = await supabase
+            const { data: newSchool, error: schoolError } = await supabase
               .from("bp_schools")
               .insert({ name: meta.school_name })
               .select("id")
               .single();
+            if (schoolError) console.error("Failed to create school on signup", schoolError);
             if (newSchool) {
-              await supabase.from("bp_school_members").insert({
+              const { error: memberError } = await supabase.from("bp_school_members").insert({
                 school_id: newSchool.id,
                 user_id: profile.id,
                 role: "school_admin",
                 status: "approved",
               });
+              if (memberError) console.error("Failed to create school_members row on signup", memberError);
             }
           }
         }

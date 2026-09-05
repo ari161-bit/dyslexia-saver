@@ -152,19 +152,19 @@ async function provisionProfile(
         status: "pending",
       });
     } else {
-      const { data: newSchool } = await supabase
+      const { data: newSchool, error: schoolError } = await supabase
         .from("bp_schools")
         .insert({ name: opts.schoolName })
         .select("id")
         .single();
-      if (newSchool) {
-        await supabase.from("bp_school_members").insert({
-          school_id: newSchool.id,
-          user_id: profileId,
-          role: "school_admin",
-          status: "approved",
-        });
-      }
+      if (schoolError) throw schoolError;
+      const { error: memberError } = await supabase.from("bp_school_members").insert({
+        school_id: newSchool.id,
+        user_id: profileId,
+        role: "school_admin",
+        status: "approved",
+      });
+      if (memberError) throw memberError;
     }
   }
 
