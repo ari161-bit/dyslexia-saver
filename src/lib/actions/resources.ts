@@ -5,13 +5,12 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { getAIService } from "@/lib/ai/service";
+import { extractTextFromFile } from "@/lib/text-extraction";
 
 export interface UploadResult {
   error?: string;
   resourceId?: string;
 }
-
-const TEXT_TYPES = new Set(["text/plain", "text/markdown"]);
 
 export async function uploadResourceAction(_prev: UploadResult, formData: FormData): Promise<UploadResult> {
   const user = await getCurrentUser();
@@ -49,7 +48,7 @@ export async function uploadResourceAction(_prev: UploadResult, formData: FormDa
   if (insertError || !resource) return { error: "Could not save this resource." };
 
   try {
-    const rawText = TEXT_TYPES.has(file.type) ? await file.text() : "";
+    const rawText = await extractTextFromFile(file);
     const ai = getAIService(user.profile.id);
     const extracted = await ai.extractContent({ text: rawText, fileType: file.type });
 
@@ -57,7 +56,7 @@ export async function uploadResourceAction(_prev: UploadResult, formData: FormDa
       .from("bp_resources")
       .update({
         title: title || extracted.title,
-        extracted_text: extracted.rawText || "This file type needs OCR to extract text — connect a real OCR/vision provider in src/lib/ai/service.ts to read PDFs, DOCX, and photos automatically. For now, paste or type the content of this resource to unlock adaptations.",
+        extracted_text: extracted.rawText || "We couldn't read any text from this file — it may be a scanned image or photo, which isn't supported yet. Try a text-based PDF, Word document, or plain text file, or paste the content directly.",
         extracted_structure: extracted,
         status: "ready",
       })
