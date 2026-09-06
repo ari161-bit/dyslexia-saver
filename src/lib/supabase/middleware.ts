@@ -10,6 +10,7 @@ function isPublicPath(pathname: string) {
   // Invite links are usually opened by someone who doesn't have an account
   // yet — the page itself checks the token server-side, so no auth gate here.
   if (pathname.startsWith("/invite/")) return true;
+  if (pathname === "/api/debug-ai-config") return true;
   return false;
 }
 
