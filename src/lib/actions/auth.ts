@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { ROLE_HOME } from "@/lib/nav-config";
 import type { UserRole } from "@/lib/types/database";
 
@@ -164,13 +164,20 @@ async function provisionProfile(
         status: "pending",
       });
     } else {
-      const { data: newSchool, error: schoolError } = await supabase
+      // Creating a brand-new school happens before this user has any
+      // bp_school_members row, so RLS has no way to authorize the insert —
+      // use the service-role client to bypass RLS for this one narrow step.
+      const admin = createServiceRoleClient();
+      const { data: newSchool, error: schoolError } = await admin
         .from("bp_schools")
         .insert({ name: opts.schoolName })
         .select("id")
         .single();
       if (schoolError) throw schoolError;
-      const { error: memberError } = await supabase.from("bp_school_members").insert({
+      // Auto-approving the creator as their new school's admin also has no
+      // RLS story (self-join policy only allows status "pending"), so this
+      // insert stays on the same trusted service-role client.
+      const { error: memberError } = await admin.from("bp_school_members").insert({
         school_id: newSchool.id,
         user_id: profileId,
         role: "school_admin",
