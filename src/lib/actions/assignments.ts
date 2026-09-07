@@ -21,7 +21,9 @@ export async function createAssignmentAction(_prev: AssignmentActionResult, form
   const dueDate = String(formData.get("dueDate") ?? "");
   const resourceId = String(formData.get("resourceId") ?? "");
 
-  if (!title || !classId) return { error: "Give the assignment a title and choose a class." };
+  if (!title && !classId) return { error: "Give the assignment a title and choose a class." };
+  if (!title) return { error: "Give the assignment a title." };
+  if (!classId) return { error: "Choose a class for this assignment." };
 
   const supabase = await createClient();
   const { data: assignment, error } = await supabase

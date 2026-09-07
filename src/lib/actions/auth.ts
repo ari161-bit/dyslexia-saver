@@ -15,8 +15,17 @@ function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 }
 
+// Excludes visually confusable characters (0/O, 1/I/L, 8/B, 2/Z, 5/S) —
+// this code gets read aloud and typed back in by parents and teachers, so
+// on a dyslexia-support app it especially can't rely on shape alone.
+const CODE_ALPHABET = "34679ACDEFGHJKMNPQRTUVWXY";
+
 function generateCode() {
-  return Math.random().toString(36).slice(2, 8).toUpperCase();
+  let code = "";
+  for (let i = 0; i < 6; i++) {
+    code += CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)];
+  }
+  return code;
 }
 
 export async function signUpAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
