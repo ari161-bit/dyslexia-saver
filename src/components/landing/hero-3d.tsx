@@ -129,15 +129,19 @@ export function Hero3D() {
           </a>
         </motion.div>
 
-        <motion.p
+        <motion.div
           variants={fadeUp}
           initial="hidden"
           animate="show"
           custom={0.7}
-          className="pointer-events-auto mt-8 text-xs font-semibold tracking-[0.2em] text-stone-400"
+          className="pointer-events-auto mt-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 text-xs font-semibold tracking-[0.1em] text-stone-400 sm:tracking-[0.2em]"
         >
-          ACCESSIBLE&nbsp;&nbsp;·&nbsp;&nbsp;PERSONALIZED&nbsp;&nbsp;·&nbsp;&nbsp;CONNECTED
-        </motion.p>
+          <span>ACCESSIBLE</span>
+          <span aria-hidden>·</span>
+          <span>PERSONALIZED</span>
+          <span aria-hidden>·</span>
+          <span>CONNECTED</span>
+        </motion.div>
       </motion.div>
 
       <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white to-transparent" />

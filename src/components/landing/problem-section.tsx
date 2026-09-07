@@ -30,7 +30,7 @@ export function ProblemSection() {
             key={area.title}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "-20% 0px" }}
+            viewport={{ once: true, margin: "0px 0px -10% 0px" }}
             transition={{ duration: 0.8, delay: i * 0.15 }}
             className="group relative bg-white p-10 sm:p-12"
           >
