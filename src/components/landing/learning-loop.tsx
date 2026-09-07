@@ -21,7 +21,30 @@ export function LearningLoop() {
         </Reveal>
       </div>
 
-      <div className="relative mx-auto mt-24 aspect-square w-full max-w-[560px]">
+      {/* The circular layout positions fixed-width cards around a ring, which
+          only has room to breathe above the sm breakpoint — on phones it
+          collapses into overlapping cards that cover the center label, so
+          mobile gets a simple 2x2 grid instead. */}
+      <div className="mx-auto mt-16 grid max-w-md grid-cols-2 gap-4 sm:hidden">
+        {ROLES.map((role, i) => (
+          <motion.div
+            key={role.title}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+            transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] as const }}
+            className="rounded-2xl border border-stone-200 bg-white p-4 text-center shadow-sm"
+          >
+            <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 text-orange-600">
+              <role.icon className="h-4 w-4" />
+            </span>
+            <p className="mt-2.5 font-heading text-xs font-semibold tracking-wide text-stone-900">{role.title}</p>
+            <p className="mt-1 text-[11px] leading-snug text-stone-500">{role.copy}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="relative mx-auto mt-24 hidden aspect-square w-full max-w-[560px] sm:block">
         <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden>
           <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(249,115,22,0.18)" strokeWidth="0.5" strokeDasharray="1.5 2.5" />
           <motion.circle
@@ -52,9 +75,9 @@ export function LearningLoop() {
             key={role.title}
             initial={{ opacity: 0, scale: 0.85 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-15% 0px" }}
+            viewport={{ once: true, margin: "0px 0px -10% 0px" }}
             transition={{ duration: 0.6, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] as const }}
-            className={`absolute w-40 rounded-2xl border border-stone-200 bg-white p-4 text-center shadow-sm sm:w-44 ${role.pos}`}
+            className={`absolute w-44 rounded-2xl border border-stone-200 bg-white p-4 text-center shadow-sm ${role.pos}`}
           >
             <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 text-orange-600">
               <role.icon className="h-4 w-4" />
