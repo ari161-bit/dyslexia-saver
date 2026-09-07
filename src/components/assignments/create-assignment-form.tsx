@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,11 @@ export function CreateAssignmentForm({
   resourceTitle?: string;
 }) {
   const [state, formAction, pending] = useActionState<AssignmentActionResult, FormData>(createAssignmentAction, {});
+  // A single-option Select can look identical whether it's open or already
+  // selected (Radix positions the lone item right over the trigger), which
+  // has tricked real clicks into "selecting" nothing. Pre-selecting the
+  // only class removes the ambiguity entirely for the common one-class case.
+  const [classId, setClassId] = useState(defaultClassId ?? (classes.length === 1 ? classes[0].id : ""));
 
   return (
     <form action={formAction} className="max-w-xl space-y-4">
@@ -44,7 +49,13 @@ export function CreateAssignmentForm({
 
       <div className="space-y-1.5">
         <Label htmlFor="classId">Class</Label>
-        <Select name="classId" defaultValue={defaultClassId}>
+        {/* Radix's native-select bubble sync isn't reliable when the
+            dropdown has few/one items (a press-drag-release can select
+            without ever updating the hidden select), so this form tracks
+            the value itself and submits it via a real hidden input instead
+            of relying on Select's `name` prop. */}
+        <input type="hidden" name="classId" value={classId} />
+        <Select value={classId} onValueChange={setClassId}>
           <SelectTrigger id="classId" className="w-full"><SelectValue placeholder="Choose a class" /></SelectTrigger>
           <SelectContent>
             {classes.map((c) => (

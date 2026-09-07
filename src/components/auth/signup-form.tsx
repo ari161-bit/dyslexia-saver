@@ -27,6 +27,7 @@ const ROLE_OPTIONS: { role: UserRole; label: string; description: string; icon: 
 export function SignupForm({ schools }: { schools: { id: string; name: string }[] }) {
   const [step, setStep] = useState<"role" | "details">("role");
   const [role, setRole] = useState<UserRole | null>(null);
+  const [schoolId, setSchoolId] = useState("");
   const [state, formAction, pending] = useActionState<ActionResult, FormData>(signUpAction, {});
 
   if (step === "role") {
@@ -106,7 +107,13 @@ export function SignupForm({ schools }: { schools: { id: string; name: string }[
         {role === "teacher" ? (
           <div className="space-y-1.5">
             <Label htmlFor="schoolId">Your school</Label>
-            <Select name="schoolId" required>
+            {/* Radix's native-select bubble sync isn't reliable when the
+                dropdown has few/one items (a press-drag-release can select
+                without ever updating the hidden select), so this form
+                tracks the value itself and submits it via a real hidden
+                input instead of relying on Select's `name` prop. */}
+            <input type="hidden" name="schoolId" value={schoolId} />
+            <Select value={schoolId} onValueChange={setSchoolId} required>
               <SelectTrigger id="schoolId" className="w-full">
                 <SelectValue placeholder="Select your school" />
               </SelectTrigger>
