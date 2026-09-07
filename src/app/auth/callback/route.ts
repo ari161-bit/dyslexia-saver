@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { ROLE_HOME } from "@/lib/nav-config";
 import type { UserRole } from "@/lib/types/database";
 
@@ -61,14 +61,18 @@ export async function GET(request: NextRequest) {
               status: "pending",
             });
           } else {
-            const { data: newSchool, error: schoolError } = await supabase
+            // Same as signUpAction: creating a brand-new school and
+            // auto-approving its creator happens before any RLS-visible
+            // relationship exists, so this needs the service-role client.
+            const admin = createServiceRoleClient();
+            const { data: newSchool, error: schoolError } = await admin
               .from("bp_schools")
               .insert({ name: meta.school_name })
               .select("id")
               .single();
             if (schoolError) console.error("Failed to create school on signup", schoolError);
             if (newSchool) {
-              const { error: memberError } = await supabase.from("bp_school_members").insert({
+              const { error: memberError } = await admin.from("bp_school_members").insert({
                 school_id: newSchool.id,
                 user_id: profile.id,
                 role: "school_admin",
