@@ -36,6 +36,19 @@ export interface RevisionGuide {
   vocabulary: VocabularyEntry[];
 }
 
+export interface WorksheetQuestion {
+  type: "short_answer" | "fill_blank" | "multiple_choice";
+  prompt: string;
+  options?: string[];
+  answer: string;
+}
+
+export interface Worksheet {
+  title: string;
+  instructions: string;
+  questions: WorksheetQuestion[];
+}
+
 export interface AccessibleVersion {
   sections: ExtractedSection[];
 }
@@ -53,6 +66,7 @@ export interface AIService {
   generateVocabulary(input: { text: string }): Promise<AIResult<VocabularyEntry[]>>;
   generatePractice(input: { text: string; count?: number }): Promise<AIResult<PracticeQuestion[]>>;
   generateRevisionGuide(input: { text: string }): Promise<AIResult<RevisionGuide>>;
+  generateWorksheet(input: { text: string; questionCount?: number }): Promise<AIResult<Worksheet>>;
 }
 
 export class AIServiceError extends Error {

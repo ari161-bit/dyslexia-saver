@@ -105,6 +105,13 @@ class GuardedAIService implements AIService {
     log("generateRevisionGuide", { chars: input.text.length });
     return withRetry(() => this.provider.generateRevisionGuide(input));
   }
+
+  async generateWorksheet(input: { text: string; questionCount?: number }) {
+    checkRateLimit(this.rateLimitKey);
+    moderate(input.text);
+    log("generateWorksheet", { chars: input.text.length, questionCount: input.questionCount });
+    return withRetry(() => this.provider.generateWorksheet(input));
+  }
 }
 
 export function getAIService(rateLimitKey: string): AIService {

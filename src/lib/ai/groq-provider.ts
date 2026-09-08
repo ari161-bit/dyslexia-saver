@@ -8,6 +8,7 @@ import {
   type PracticeQuestion,
   type RevisionGuide,
   type VocabularyEntry,
+  type Worksheet,
 } from "./types";
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
@@ -106,6 +107,13 @@ export class GroqAIProvider implements AIService {
       `Source text:\n"""${truncate(text)}"""\n\nWrite ${count} short-answer practice questions based only on this text. Each answer must be a single word or short phrase that appears in or is directly supported by the source, so it can be checked by exact match. Include the exact sentence from the source that supports each answer. Return JSON: {"questions": [{"question": string, "type": "short_answer", "answer": string, "sourceQuote": string}]}.`,
     )) as { questions: PracticeQuestion[] };
     return { data: result.questions ?? [], groundedIn: text, provider: this.name };
+  }
+
+  async generateWorksheet({ text, questionCount = 6 }: { text: string; questionCount?: number }): Promise<AIResult<Worksheet>> {
+    const result = (await callGroq(
+      `Source material:\n"""${truncate(text)}"""\n\nCreate a printable worksheet with ${questionCount} questions based only on this material — mix short-answer and fill-in-the-blank questions. Every answer must be directly supported by the source material, never invented. Return JSON: {"title": string, "instructions": string, "questions": [{"type": "short_answer"|"fill_blank", "prompt": string, "answer": string}]}. "instructions" is one short sentence telling the student what to do.`,
+    )) as Worksheet;
+    return { data: result, groundedIn: text, provider: this.name };
   }
 
   async generateRevisionGuide({ text }: { text: string }): Promise<AIResult<RevisionGuide>> {
