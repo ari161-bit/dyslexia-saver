@@ -65,6 +65,31 @@ export async function generatePracticeAction(resourceText: string, count = 5): P
   }
 }
 
+export interface WorksheetResult {
+  worksheet?: {
+    title: string;
+    instructions: string;
+    questions: { type: string; prompt: string; answer: string }[];
+  };
+  error?: string;
+}
+
+export async function generateWorksheetAction(sourceText: string, questionCount = 6): Promise<WorksheetResult> {
+  const user = await getCurrentUser();
+  if (!user?.profile) return { error: "Please sign in." };
+  if (!sourceText.trim() || sourceText.trim().split(/\s+/).length < 15) {
+    return { error: "Paste a bit more material — at least a few sentences — so the worksheet has something to work from." };
+  }
+
+  try {
+    const ai = getAIService(user.profile.id);
+    const result = await ai.generateWorksheet({ text: sourceText, questionCount });
+    return { worksheet: result.data };
+  } catch {
+    return { error: "Couldn't generate a worksheet right now. Try again shortly." };
+  }
+}
+
 export interface SaveNoteResult {
   error?: string;
   success?: boolean;

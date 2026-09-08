@@ -41,6 +41,7 @@ export const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
     { label: "Classes", href: "/teacher/classes", icon: GraduationCap },
     { label: "Students", href: "/teacher/students", icon: Users },
     { label: "Resources", href: "/teacher/resources", icon: FolderOpen },
+    { label: "Worksheets", href: "/teacher/worksheets", icon: PenLine },
     { label: "Assignments", href: "/teacher/assignments", icon: ClipboardList },
     { label: "Progress", href: "/teacher/progress", icon: BarChart3 },
     { label: "Messages", href: "/teacher/messages", icon: MessageSquare },

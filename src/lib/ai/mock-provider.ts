@@ -7,6 +7,8 @@ import type {
   PracticeQuestion,
   RevisionGuide,
   VocabularyEntry,
+  Worksheet,
+  WorksheetQuestion,
 } from "./types";
 
 // Deterministic, source-grounded stand-in for a real LLM/OCR provider.
@@ -133,6 +135,42 @@ export class MockAIProvider implements AIService {
       };
     });
     return { data: questions, groundedIn: text, provider: this.name };
+  }
+
+  async generateWorksheet({ text, questionCount = 6 }: { text: string; questionCount?: number }): Promise<AIResult<Worksheet>> {
+    const sentences = splitSentences(text).filter((s) => s.split(" ").length > 5);
+    const titleGuess = sentences[0]?.split(/[.!?]/)[0]?.trim().slice(0, 70) || "Worksheet";
+    const picked = sentences.slice(0, questionCount);
+    const words = difficultWords(text, questionCount);
+
+    const questions: WorksheetQuestion[] = picked.map((sentence, i) => {
+      // Alternate fill-in-the-blank and short-answer so a worksheet doesn't
+      // read as one repetitive question type.
+      if (i % 2 === 0) {
+        const wordsInSentence = sentence.replace(/[.?!]$/, "").split(" ");
+        const blankIndex = wordsInSentence.findIndex((w) => w.length > 5 && !COMMON_WORDS.has(w.toLowerCase()));
+        const answer = blankIndex >= 0 ? wordsInSentence[blankIndex].replace(/[,.]$/, "") : wordsInSentence[wordsInSentence.length - 1];
+        const prompt = blankIndex >= 0 ? wordsInSentence.map((w, j) => (j === blankIndex ? "_____" : w)).join(" ") : sentence;
+        return { type: "fill_blank", prompt, answer };
+      }
+      return { type: "short_answer", prompt: `In your own words, what does this mean: "${sentence}"?`, answer: sentence };
+    });
+
+    // Round out with vocabulary questions if there weren't enough sentences.
+    while (questions.length < questionCount && words.length > 0) {
+      const word = words[questions.length % words.length];
+      questions.push({ type: "short_answer", prompt: `What does "${word}" mean in this text?`, answer: word });
+    }
+
+    return {
+      data: {
+        title: titleCase(titleGuess),
+        instructions: "Answer each question using only what's in the material below. Write your answers in complete sentences where you can.",
+        questions,
+      },
+      groundedIn: text,
+      provider: this.name,
+    };
   }
 
   async generateRevisionGuide({ text }: { text: string }): Promise<AIResult<RevisionGuide>> {
