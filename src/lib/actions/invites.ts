@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { sendInviteEmail } from "@/lib/email";
+import { generateStudentCode } from "@/lib/student-code";
 import { ROLE_HOME } from "@/lib/nav-config";
 import type { UserRole } from "@/lib/types/database";
 
@@ -100,6 +101,71 @@ export async function inviteStudentAction(_prev: InviteActionResult, formData: F
   return { success: true, acceptUrl };
 }
 
+export interface BulkInviteResult {
+  error?: string;
+  sent?: number;
+  skipped?: number;
+  total?: number;
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Onboard a whole roster at once instead of one email at a time — pastes
+// straight from a spreadsheet column, one address per line.
+export async function bulkInviteStudentsAction(_prev: BulkInviteResult, formData: FormData): Promise<BulkInviteResult> {
+  const user = await getCurrentUser();
+  if (!user?.profile || user.profile.role !== "teacher") return { error: "Only a teacher can invite students." };
+
+  const classId = String(formData.get("classId") ?? "").trim();
+  const raw = String(formData.get("emails") ?? "");
+  if (!classId) return { error: "Missing class." };
+
+  const emails = Array.from(
+    new Set(
+      raw
+        .split(/[\n,]/)
+        .map((e) => e.trim().toLowerCase())
+        .filter((e) => e.length > 0 && EMAIL_RE.test(e)),
+    ),
+  );
+  if (emails.length === 0) return { error: "Paste at least one valid email address, one per line." };
+
+  const supabase = await createClient();
+  const { data: klass } = await supabase
+    .from("bp_classes")
+    .select("id, name, school_id, bp_schools(name)")
+    .eq("id", classId)
+    .eq("teacher_id", user.profile.id)
+    .maybeSingle();
+  if (!klass) return { error: "You can only invite students to your own classes." };
+
+  const schoolName = (klass.bp_schools as unknown as { name: string } | null)?.name ?? "Brightpath";
+  const inviterName = `${user.profile.first_name} ${user.profile.last_name}`;
+
+  let sent = 0;
+  for (const email of emails) {
+    const { data: invite, error } = await supabase
+      .from("bp_invites")
+      .insert({ school_id: klass.school_id, class_id: klass.id, inviter_id: user.profile.id, email, role: "student" })
+      .select("token")
+      .single();
+    if (error || !invite) continue; // most likely a duplicate pending invite for this email — skip, don't fail the whole batch
+
+    await sendInviteEmail({
+      to: email,
+      inviterName,
+      schoolName,
+      className: klass.name,
+      role: "student",
+      acceptUrl: `${siteUrl()}/invite/${invite.token}`,
+    });
+    sent++;
+  }
+
+  revalidatePath(`/teacher/classes/${classId}`);
+  return { sent, skipped: emails.length - sent, total: emails.length };
+}
+
 export async function revokeInviteAction(inviteId: string) {
   const user = await getCurrentUser();
   if (!user?.profile) return;
@@ -158,7 +224,7 @@ export async function acceptInviteSignUpAction(_prev: InviteActionResult, formDa
       role: invite.role,
       first_name: firstName,
       last_name: lastName,
-      student_code: invite.role === "student" ? Math.random().toString(36).slice(2, 8).toUpperCase() : null,
+      student_code: invite.role === "student" ? generateStudentCode() : null,
     });
     if (profileError) return { error: "Account created, but we couldn't finish setup. Try logging in." };
 

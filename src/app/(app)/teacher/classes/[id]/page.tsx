@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { CopyCodeButton } from "@/components/classes/copy-code-button";
 import { InviteStudentDialog } from "@/components/classes/invite-student-dialog";
+import { BulkInviteDialog } from "@/components/classes/bulk-invite-dialog";
 import { getClassDetail } from "@/lib/data/teacher";
 
 export default async function TeacherClassDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -39,6 +40,7 @@ export default async function TeacherClassDetailPage({ params }: { params: Promi
           <div className="flex items-center gap-2">
             <CopyCodeButton code={detail.joinCode} />
             <InviteStudentDialog classId={detail.id} />
+            <BulkInviteDialog classId={detail.id} />
           </div>
         </CardContent>
       </Card>

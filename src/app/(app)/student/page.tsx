@@ -1,13 +1,14 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { BookOpen, ClipboardList, Ear, FileUp, Sparkles } from "lucide-react";
+import { BookOpen, ClipboardList, Ear, FileUp, Flame, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { AssignmentRow } from "@/components/shared/assignment-row";
+import { BadgeGrid } from "@/components/student/badge-grid";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
-import { getContinueLearning, getUpcomingAssignments, getWeeklyProgress } from "@/lib/data/student";
+import { getContinueLearning, getUpcomingAssignments, getWeeklyProgress, getStudentStreak, getStudentBadges } from "@/lib/data/student";
 
 export const metadata: Metadata = { title: "Home" };
 
@@ -30,15 +31,30 @@ export default async function StudentHomePage() {
   const user = await getCurrentUser();
   const profile = user!.profile!;
 
-  const [continueLearning, assignments, progress] = await Promise.all([
+  const [continueLearning, assignments, progress, streak, badges] = await Promise.all([
     getContinueLearning(profile.id),
     getUpcomingAssignments(profile.id),
     getWeeklyProgress(profile.id),
+    getStudentStreak(profile.id),
+    getStudentBadges(profile.id),
   ]);
 
   return (
     <div className="space-y-8">
-      <PageHeader size="lg" title={`${greeting()}, ${profile.first_name}! 👋`} description="What do you want to do today?" />
+      <PageHeader
+        size="lg"
+        title={`${greeting()}, ${profile.first_name}! 👋`}
+        description="What do you want to do today?"
+        action={
+          streak.currentStreak > 0 ? (
+            <div className="flex items-center gap-2 rounded-2xl border-2 border-orange-200 bg-orange-50 px-4 py-2.5 text-orange-700">
+              <Flame className="h-5 w-5 fill-orange-500 text-orange-500" />
+              <span className="font-heading text-lg font-extrabold">{streak.currentStreak}</span>
+              <span className="text-sm font-bold">day{streak.currentStreak === 1 ? "" : "s"} in a row</span>
+            </div>
+          ) : undefined
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
@@ -138,6 +154,13 @@ export default async function StudentHomePage() {
               <Button variant="outline" className="mt-5 h-12 w-full rounded-2xl text-base font-bold" asChild>
                 <Link href="/student/progress">See my progress</Link>
               </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-3xl border-2">
+            <CardContent className="p-6">
+              <p className="text-base font-bold text-primary">🏆 Your badges</p>
+              <BadgeGrid badges={badges} />
             </CardContent>
           </Card>
         </div>

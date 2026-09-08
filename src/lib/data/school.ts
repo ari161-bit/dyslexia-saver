@@ -70,6 +70,99 @@ export async function getSchoolOverviewStats(schoolId: string): Promise<SchoolOv
   };
 }
 
+export interface EngagementWeek {
+  weekStart: string;
+  activeStudents: number;
+}
+
+function startOfWeek(date: Date): string {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = (day === 0 ? -6 : 1) - day; // Monday as the start of the week
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().slice(0, 10);
+}
+
+// Distinct active students per week, for the school's whole student body —
+// the trend line that actually shows whether adoption is growing.
+export async function getSchoolEngagementTrend(schoolId: string, weeks = 8): Promise<EngagementWeek[]> {
+  const supabase = await createClient();
+  const { data: classes } = await supabase.from("bp_classes").select("id").eq("school_id", schoolId);
+  const classIds = (classes ?? []).map((c) => c.id);
+
+  const buckets = new Map<string, Set<string>>();
+  for (let i = 0; i < weeks; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - (weeks - 1 - i) * 7);
+    buckets.set(startOfWeek(d), new Set());
+  }
+  if (classIds.length === 0) return Array.from(buckets.entries()).map(([weekStart, set]) => ({ weekStart, activeStudents: set.size }));
+
+  const { data: roster } = await supabase.from("bp_class_members").select("student_id").in("class_id", classIds);
+  const studentIds = Array.from(new Set((roster ?? []).map((r) => r.student_id)));
+  if (studentIds.length === 0) return Array.from(buckets.entries()).map(([weekStart, set]) => ({ weekStart, activeStudents: set.size }));
+
+  const since = new Date();
+  since.setDate(since.getDate() - weeks * 7);
+  const { data: events } = await supabase
+    .from("bp_progress_events")
+    .select("student_id, created_at")
+    .in("student_id", studentIds)
+    .gte("created_at", since.toISOString());
+
+  (events ?? []).forEach((e) => {
+    const key = startOfWeek(new Date(e.created_at));
+    if (buckets.has(key)) buckets.get(key)!.add(e.student_id);
+  });
+
+  return Array.from(buckets.entries()).map(([weekStart, set]) => ({ weekStart, activeStudents: set.size }));
+}
+
+export interface SchoolAIUsage {
+  adaptationsGenerated: number;
+  adaptationsApproved: number;
+}
+
+// How much the AI-adaptation feature is actually being used — the number
+// investors want to see for an "AI-powered" product, not just that it exists.
+export async function getSchoolAIUsage(schoolId: string): Promise<SchoolAIUsage> {
+  const supabase = await createClient();
+  const { data: resources } = await supabase.from("bp_resources").select("id").eq("school_id", schoolId);
+  const resourceIds = (resources ?? []).map((r) => r.id);
+  if (resourceIds.length === 0) return { adaptationsGenerated: 0, adaptationsApproved: 0 };
+
+  const [{ count: total }, { count: approved }] = await Promise.all([
+    supabase.from("bp_resource_adaptations").select("id", { count: "exact", head: true }).in("resource_id", resourceIds),
+    supabase.from("bp_resource_adaptations").select("id", { count: "exact", head: true }).in("resource_id", resourceIds).eq("approved", true),
+  ]);
+
+  return { adaptationsGenerated: total ?? 0, adaptationsApproved: approved ?? 0 };
+}
+
+export interface SchoolCompletionStats {
+  assignmentsCreated: number;
+  submissionsReceived: number;
+  submissionsReviewed: number;
+}
+
+export async function getSchoolCompletionStats(schoolId: string): Promise<SchoolCompletionStats> {
+  const supabase = await createClient();
+  const { data: classes } = await supabase.from("bp_classes").select("id").eq("school_id", schoolId);
+  const classIds = (classes ?? []).map((c) => c.id);
+  if (classIds.length === 0) return { assignmentsCreated: 0, submissionsReceived: 0, submissionsReviewed: 0 };
+
+  const { data: assignments } = await supabase.from("bp_assignments").select("id").in("class_id", classIds);
+  const assignmentIds = (assignments ?? []).map((a) => a.id);
+  if (assignmentIds.length === 0) return { assignmentsCreated: 0, submissionsReceived: 0, submissionsReviewed: 0 };
+
+  const [{ count: submissions }, { count: reviewed }] = await Promise.all([
+    supabase.from("bp_submissions").select("id", { count: "exact", head: true }).in("assignment_id", assignmentIds),
+    supabase.from("bp_submissions").select("id", { count: "exact", head: true }).in("assignment_id", assignmentIds).eq("status", "reviewed"),
+  ]);
+
+  return { assignmentsCreated: assignmentIds.length, submissionsReceived: submissions ?? 0, submissionsReviewed: reviewed ?? 0 };
+}
+
 export interface SchoolStaffMember {
   id: string;
   profileId: string;
