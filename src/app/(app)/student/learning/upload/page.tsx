@@ -8,7 +8,8 @@ export default function StudentUploadPage() {
   return (
     <div className="mx-auto max-w-2xl">
       <PageHeader
-        title="Upload a page"
+        size="lg"
+        title="Upload a Page 📤"
         description="Add a worksheet, photo, or document — we'll turn it into something easier to read."
       />
       <UploadDropzone destination="student" />

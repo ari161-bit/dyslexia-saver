@@ -13,8 +13,9 @@ export default async function PracticePage() {
   return (
     <div>
       <PageHeader
-        title="Practice"
-        description="Questions generated from your own material — never made up, always grounded in what you've read."
+        size="lg"
+        title="Practice Time 🎯"
+        description="Questions made from your own material — nothing made up, always based on what you've actually read."
       />
       <PracticeSession resources={resources} />
     </div>

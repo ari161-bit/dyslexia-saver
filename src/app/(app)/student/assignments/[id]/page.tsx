@@ -25,6 +25,7 @@ export default async function StudentAssignmentDetailPage({
   return (
     <div className="mx-auto max-w-2xl">
       <PageHeader
+        size="lg"
         title={assignment.title}
         description={`${className}${assignment.subject ? ` · ${assignment.subject}` : ""}${
           assignment.due_date ? ` · Due ${format(new Date(assignment.due_date), "MMM d, yyyy")}` : ""
@@ -33,36 +34,36 @@ export default async function StudentAssignmentDetailPage({
 
       <div className="space-y-6">
         {assignment.instructions ? (
-          <Card>
-            <CardContent>
-              <p className="text-sm font-semibold text-muted-foreground">Instructions</p>
-              <p className="mt-2 whitespace-pre-line text-sm">{assignment.instructions}</p>
+          <Card className="rounded-3xl border-2">
+            <CardContent className="p-6">
+              <p className="text-base font-bold text-primary">📋 Instructions</p>
+              <p className="mt-3 whitespace-pre-line text-base leading-relaxed">{assignment.instructions}</p>
             </CardContent>
           </Card>
         ) : null}
 
         {resource ? (
-          <Card>
-            <CardContent className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-                  <BookOpen className="h-5 w-5" />
+          <Card className="rounded-3xl border-2">
+            <CardContent className="flex items-center justify-between gap-4 p-6">
+              <div className="flex items-center gap-3.5">
+                <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
+                  <BookOpen className="h-6 w-6" />
                 </span>
                 <div>
-                  <p className="font-medium">{resource.title}</p>
-                  <p className="text-xs text-muted-foreground">Open with your reading preferences</p>
+                  <p className="text-base font-bold">{resource.title}</p>
+                  <p className="text-sm text-muted-foreground">Opens set up just how you like to read</p>
                 </div>
               </div>
-              <Button variant="outline" asChild>
+              <Button variant="outline" className="h-12 rounded-2xl px-5 text-base font-bold" asChild>
                 <Link href={`/read/${resource.id}`}>Open</Link>
               </Button>
             </CardContent>
           </Card>
         ) : null}
 
-        <Card>
-          <CardContent>
-            <p className="mb-3 text-sm font-semibold text-muted-foreground">Your response</p>
+        <Card className="rounded-3xl border-2">
+          <CardContent className="p-6">
+            <p className="mb-4 text-base font-bold text-primary">✏️ Your answer</p>
             <SubmissionForm assignmentId={assignment.id} initialContent={content} status={submission?.status ?? "not_started"} />
           </CardContent>
         </Card>

@@ -20,18 +20,19 @@ export default async function MyLearningPage() {
   return (
     <div>
       <PageHeader
-        title="My Learning"
-        description="Everything shared with you or uploaded by you, in one place."
+        size="lg"
+        title="My Learning 📚"
+        description="Everything shared with you, or that you've added yourself."
         action={
-          <Button asChild>
+          <Button asChild className="h-12 rounded-2xl px-5 text-base font-bold">
             <Link href="/student/learning/upload">
-              <Plus className="h-4 w-4" /> Upload a page
+              <Plus className="h-5 w-5" /> Upload a page
             </Link>
           </Button>
         }
       />
-      <Card className="mb-6">
-        <CardContent>
+      <Card className="mb-6 rounded-3xl border-2">
+        <CardContent className="p-6">
           <JoinClassForm />
         </CardContent>
       </Card>
@@ -39,9 +40,9 @@ export default async function MyLearningPage() {
         <EmptyState
           icon={BookOpen}
           title="Nothing here yet"
-          description="Once your teacher assigns something, or you upload your own material, it'll show up here."
+          description="Once your teacher assigns something, or you add your own material, it'll show up here."
           action={
-            <Button asChild size="sm">
+            <Button asChild className="h-11 rounded-2xl px-5 font-bold">
               <Link href="/student/learning/upload">Upload your first page</Link>
             </Button>
           }
