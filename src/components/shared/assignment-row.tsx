@@ -35,17 +35,17 @@ export function AssignmentRow({
   return (
     <Link
       href={href}
-      className="flex items-center justify-between gap-4 rounded-xl border border-border/70 bg-card px-4 py-3.5 transition-colors hover:border-primary/40 hover:bg-accent/40"
+      className="flex items-center justify-between gap-4 rounded-2xl border-2 border-border/70 bg-card px-4 py-4 transition-all hover:scale-[1.01] hover:border-primary/40 hover:bg-accent/40"
     >
       <div className="min-w-0">
-        <p className="truncate font-medium">{title}</p>
-        <p className="mt-0.5 truncate text-xs text-muted-foreground">
+        <p className="truncate text-base font-bold">{title}</p>
+        <p className="mt-1 truncate text-sm text-muted-foreground">
           {className}
           {subject ? ` · ${subject}` : ""}
           {dueDate ? ` · Due ${format(new Date(dueDate), "MMM d")}` : ""}
         </p>
       </div>
-      <Badge className={cn("shrink-0 border-none font-normal", STATUS_STYLE[status])}>
+      <Badge className={cn("shrink-0 border-none px-3 py-1 text-sm font-semibold", STATUS_STYLE[status])}>
         {STATUS_LABEL[status] ?? status}
       </Badge>
     </Link>

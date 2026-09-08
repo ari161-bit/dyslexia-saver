@@ -29,8 +29,9 @@ export default async function StudentProgressPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Your Progress"
-        description="A record of the work you've been putting in — not a score, just a picture of your practice."
+        size="lg"
+        title="Your Progress 🌟"
+        description="A picture of the work you've been putting in — not a score, just how much you've practiced."
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -39,26 +40,26 @@ export default async function StudentProgressPage() {
         <StatCard label="Practice completed" value={weekly.practiceCompleted} icon={ClipboardCheck} />
       </div>
 
-      <Card>
-        <CardContent>
-          <p className="text-sm font-semibold text-muted-foreground">Activity, last 14 days</p>
+      <Card className="rounded-3xl border-2">
+        <CardContent className="p-6">
+          <p className="text-base font-bold text-primary">📈 Last 14 days</p>
           <ActivityChart data={timeline} />
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent>
-          <p className="mb-3 text-sm font-semibold text-muted-foreground">Areas you've been practicing</p>
+      <Card className="rounded-3xl border-2">
+        <CardContent className="p-6">
+          <p className="mb-4 text-base font-bold text-primary">🎯 What you've been practicing</p>
           {breakdown.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Once you start reading and practicing, you&apos;ll see a breakdown here.
+            <p className="text-base text-muted-foreground">
+              Once you start reading and practicing, you&apos;ll see it here.
             </p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {breakdown.map((b) => (
-                <div key={b.eventType} className="flex items-center justify-between rounded-lg bg-secondary/50 px-3 py-2 text-sm">
-                  <span>{LABELS[b.eventType] ?? b.eventType}</span>
-                  <span className="font-medium">{b.count}</span>
+                <div key={b.eventType} className="flex items-center justify-between rounded-2xl bg-secondary/50 px-4 py-3 text-base">
+                  <span className="font-medium">{LABELS[b.eventType] ?? b.eventType}</span>
+                  <span className="font-bold">{b.count}</span>
                 </div>
               ))}
             </div>

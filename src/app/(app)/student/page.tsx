@@ -12,11 +12,11 @@ import { getContinueLearning, getUpcomingAssignments, getWeeklyProgress } from "
 export const metadata: Metadata = { title: "Home" };
 
 const QUICK_ACTIONS = [
-  { href: "/student/learning?mode=read", label: "Read something", icon: BookOpen },
-  { href: "/student/learning/upload", label: "Upload a page", icon: FileUp },
-  { href: "/student/learning?mode=listen", label: "Listen", icon: Ear },
-  { href: "/student/practice", label: "Ask for an explanation", icon: Sparkles },
-  { href: "/student/practice", label: "Practice", icon: ClipboardList },
+  { href: "/student/learning?mode=read", label: "Read something", icon: BookOpen, color: "bg-chart-1/15 text-chart-1" },
+  { href: "/student/learning/upload", label: "Upload a page", icon: FileUp, color: "bg-chart-2/15 text-chart-2" },
+  { href: "/student/learning?mode=listen", label: "Listen", icon: Ear, color: "bg-chart-3/15 text-chart-3" },
+  { href: "/student/practice", label: "Ask for help", icon: Sparkles, color: "bg-chart-4/15 text-chart-4" },
+  { href: "/student/practice", label: "Practice time", icon: ClipboardList, color: "bg-success/15 text-success" },
 ];
 
 function greeting() {
@@ -38,34 +38,34 @@ export default async function StudentHomePage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader title={`${greeting()}, ${profile.first_name}`} description="Ready to learn?" />
+      <PageHeader size="lg" title={`${greeting()}, ${profile.first_name}! 👋`} description="What do you want to do today?" />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <Card>
-            <CardContent>
-              <p className="text-sm font-semibold text-muted-foreground">Continue Learning</p>
+          <Card className="rounded-3xl border-2">
+            <CardContent className="p-6">
+              <p className="text-base font-bold text-primary">📖 Keep reading</p>
               {continueLearning ? (
-                <div className="mt-3 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                <div className="mt-4 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                   <div>
-                    <p className="font-heading text-lg font-semibold">{continueLearning.title}</p>
+                    <p className="font-heading text-xl font-bold">{continueLearning.title}</p>
                     {continueLearning.subject ? (
-                      <p className="text-sm text-muted-foreground">{continueLearning.subject}</p>
+                      <p className="text-base text-muted-foreground">{continueLearning.subject}</p>
                     ) : null}
                   </div>
-                  <Button asChild>
-                    <Link href={`/read/${continueLearning.resourceId}`}>Continue</Link>
+                  <Button asChild className="h-12 rounded-2xl px-6 text-base font-bold">
+                    <Link href={`/read/${continueLearning.resourceId}`}>Keep going →</Link>
                   </Button>
                 </div>
               ) : (
                 <EmptyState
-                  className="mt-3 border-none bg-transparent py-6"
+                  className="mt-4 border-none bg-transparent py-8"
                   icon={BookOpen}
                   title="Nothing open yet"
-                  description="Once you start a lesson, you can pick up right where you left off."
+                  description="Pick something to read and come back here anytime to jump right back in."
                   action={
-                    <Button asChild size="sm">
-                      <Link href="/student/learning">Browse My Learning</Link>
+                    <Button asChild className="h-12 rounded-2xl px-6 text-base font-bold">
+                      <Link href="/student/learning">Find something to read</Link>
                     </Button>
                   }
                 />
@@ -73,21 +73,21 @@ export default async function StudentHomePage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent>
+          <Card className="rounded-3xl border-2">
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-muted-foreground">Today&apos;s Focus</p>
-                <Link href="/student/assignments" className="text-sm font-medium text-primary hover:underline">
-                  View all
+                <p className="text-base font-bold text-primary">✅ Today&apos;s to-dos</p>
+                <Link href="/student/assignments" className="text-base font-semibold text-primary hover:underline">
+                  See all
                 </Link>
               </div>
-              <div className="mt-3 space-y-2.5">
+              <div className="mt-4 space-y-3">
                 {assignments.length === 0 ? (
                   <EmptyState
-                    className="border-none bg-transparent py-6"
+                    className="border-none bg-transparent py-8"
                     icon={ClipboardList}
-                    title="No assignments yet"
-                    description="Your teacher hasn't shared anything here yet."
+                    title="Nothing due right now"
+                    description="You're all caught up! Your teacher will add things here when there's something new."
                   />
                 ) : (
                   assignments.map((a) => (
@@ -108,18 +108,18 @@ export default async function StudentHomePage() {
         </div>
 
         <div className="space-y-6">
-          <Card>
-            <CardContent>
-              <p className="text-sm font-semibold text-muted-foreground">Quick Actions</p>
-              <div className="mt-3 grid grid-cols-1 gap-2">
-                {QUICK_ACTIONS.map(({ href, label, icon: Icon }) => (
+          <Card className="rounded-3xl border-2">
+            <CardContent className="p-6">
+              <p className="text-base font-bold text-primary">✨ Let&apos;s go!</p>
+              <div className="mt-4 grid grid-cols-1 gap-2.5">
+                {QUICK_ACTIONS.map(({ href, label, icon: Icon, color }) => (
                   <Link
                     key={label}
                     href={href}
-                    className="flex items-center gap-3 rounded-xl border border-border/70 px-3 py-2.5 text-sm font-medium transition-colors hover:border-primary/40 hover:bg-accent/40"
+                    className="flex items-center gap-3.5 rounded-2xl border-2 border-border/70 px-4 py-3.5 text-base font-bold transition-all hover:scale-[1.02] hover:border-primary/50 hover:bg-accent/40"
                   >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-accent-foreground">
-                      <Icon className="h-4 w-4" />
+                    <span className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl ${color}`}>
+                      <Icon className="h-6 w-6" />
                     </span>
                     {label}
                   </Link>
@@ -128,16 +128,14 @@ export default async function StudentHomePage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent>
-              <p className="text-sm font-semibold text-muted-foreground">This Week</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                You&apos;ve completed{" "}
-                <span className="font-semibold text-foreground">{progress.activitiesCompleted}</span>{" "}
-                {progress.activitiesCompleted === 1 ? "activity" : "activities"} this week. Nice and
-                steady — keep going at your own pace.
+          <Card className="rounded-3xl border-2 bg-gradient-to-br from-success/10 to-transparent">
+            <CardContent className="p-6">
+              <p className="text-base font-bold text-primary">🌟 This week</p>
+              <p className="mt-3 text-base leading-relaxed text-foreground/90">
+                You&apos;ve done <span className="font-heading text-2xl font-extrabold text-success">{progress.activitiesCompleted}</span>{" "}
+                {progress.activitiesCompleted === 1 ? "activity" : "activities"} this week. That&apos;s awesome — keep it up, at your own pace!
               </p>
-              <Button variant="outline" className="mt-4 w-full" asChild>
+              <Button variant="outline" className="mt-5 h-12 w-full rounded-2xl text-base font-bold" asChild>
                 <Link href="/student/progress">See my progress</Link>
               </Button>
             </CardContent>

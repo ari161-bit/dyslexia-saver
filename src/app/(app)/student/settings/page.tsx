@@ -15,7 +15,7 @@ export default async function StudentSettingsPage() {
 
   return (
     <div>
-      <PageHeader title="Settings" description="Make Brightpath feel right for you." />
+      <PageHeader size="lg" title="Settings ⚙️" description="Make Brightpath feel just right for you." />
       <Tabs defaultValue="accessibility">
         <TabsList>
           <TabsTrigger value="accessibility">Accessibility</TabsTrigger>

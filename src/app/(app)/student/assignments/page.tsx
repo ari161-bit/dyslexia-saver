@@ -14,11 +14,11 @@ export default async function StudentAssignmentsPage() {
 
   return (
     <div>
-      <PageHeader title="Assignments" description="Everything your teachers have shared with you." />
+      <PageHeader size="lg" title="My Assignments 📝" description="Everything your teachers have shared with you." />
       {assignments.length === 0 ? (
-        <EmptyState icon={ClipboardList} title="No assignments yet" description="Your teacher hasn't shared anything here yet." />
+        <EmptyState icon={ClipboardList} title="Nothing here yet" description="Your teacher will add things here when there's something new for you." />
       ) : (
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {assignments.map((a) => (
             <AssignmentRow
               key={a.id}
