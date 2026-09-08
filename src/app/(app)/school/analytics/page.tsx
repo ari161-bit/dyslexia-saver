@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { format } from "date-fns";
-import { BarChart3, Sparkles, TrendingUp } from "lucide-react";
+import { BarChart3, CheckCircle2, ClipboardList, Sparkles, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ExportAnalyticsButton } from "@/components/school/export-analytics-button";
+import { StatCard } from "@/components/school/stat-card";
+import { WeeklyTrendChart } from "@/components/school/weekly-trend-chart";
+import { CompletionRing } from "@/components/school/completion-ring";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import {
   getSchoolClasses,
@@ -28,7 +30,6 @@ export default async function SchoolAnalyticsPage() {
     getSchoolCompletionStats(school!.schoolId),
   ]);
   const maxClass = Math.max(1, ...classes.map((c) => c.studentCount));
-  const maxTrend = Math.max(1, ...trend.map((w) => w.activeStudents));
   const completionRate = completion.assignmentsCreated > 0 ? Math.round((completion.submissionsReceived / completion.assignmentsCreated) * 100) : 0;
 
   return (
@@ -49,10 +50,10 @@ export default async function SchoolAnalyticsPage() {
       />
 
       <Card>
-        <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-          <div><p className="text-2xl font-semibold">{stats.students}</p><p className="text-xs text-muted-foreground">Students</p></div>
-          <div><p className="text-2xl font-semibold">{stats.assignments}</p><p className="text-xs text-muted-foreground">Assignments created</p></div>
-          <div><p className="text-2xl font-semibold">{stats.accessibilityUsage}</p><p className="text-xs text-muted-foreground">Using accessibility settings</p></div>
+        <CardContent className="grid grid-cols-2 gap-6 sm:grid-cols-3">
+          <StatCard icon={<Users />} value={stats.students} label="Students" color={1} delay={0} />
+          <StatCard icon={<ClipboardList />} value={stats.assignments} label="Assignments created" color={2} delay={0.05} />
+          <StatCard icon={<CheckCircle2 />} value={stats.accessibilityUsage} label="Using accessibility settings" color={3} delay={0.1} />
         </CardContent>
       </Card>
 
@@ -60,12 +61,12 @@ export default async function SchoolAnalyticsPage() {
         <Card>
           <CardContent>
             <p className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
-              <Sparkles className="h-4 w-4" /> AI adaptation usage
+              <Sparkles className="h-4 w-4 text-chart-3" /> AI adaptation usage
             </p>
             <p className="text-xs text-muted-foreground">How much teachers rely on AI-generated adaptations.</p>
             <div className="mt-4 grid grid-cols-2 gap-4">
-              <div><p className="text-2xl font-semibold">{aiUsage.adaptationsGenerated}</p><p className="text-xs text-muted-foreground">Adaptations generated</p></div>
-              <div><p className="text-2xl font-semibold">{aiUsage.adaptationsApproved}</p><p className="text-xs text-muted-foreground">Approved for students</p></div>
+              <StatCard icon={<Sparkles />} value={aiUsage.adaptationsGenerated} label="Adaptations generated" color={3} />
+              <StatCard icon={<CheckCircle2 />} value={aiUsage.adaptationsApproved} label="Approved for students" color={2} delay={0.05} />
             </div>
           </CardContent>
         </Card>
@@ -73,19 +74,15 @@ export default async function SchoolAnalyticsPage() {
         <Card>
           <CardContent>
             <p className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
-              <BarChart3 className="h-4 w-4" /> Assignment completion
+              <BarChart3 className="h-4 w-4 text-chart-1" /> Assignment completion
             </p>
             <p className="text-xs text-muted-foreground">Submissions received against assignments created.</p>
-            <div className="mt-4 flex items-center gap-4">
-              <p className="text-3xl font-semibold">{completionRate}%</p>
-              <div className="flex-1">
-                <div className="h-2.5 w-full overflow-hidden rounded-full bg-secondary">
-                  <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, completionRate)}%` }} />
-                </div>
-                <p className="mt-1.5 text-xs text-muted-foreground">
-                  {completion.submissionsReceived} submitted · {completion.submissionsReviewed} reviewed
-                </p>
-              </div>
+            <div className="mt-4 flex items-center gap-5">
+              <CompletionRing percent={completionRate} />
+              <p className="text-sm text-muted-foreground">
+                <span className="font-semibold text-foreground">{completion.submissionsReceived}</span> submitted ·{" "}
+                <span className="font-semibold text-foreground">{completion.submissionsReviewed}</span> reviewed
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -94,26 +91,13 @@ export default async function SchoolAnalyticsPage() {
       <Card>
         <CardContent>
           <p className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
-            <TrendingUp className="h-4 w-4" /> Weekly active students
+            <BarChart3 className="h-4 w-4 text-chart-1" /> Weekly active students
           </p>
           <p className="mb-4 text-xs text-muted-foreground">Distinct students with at least one activity that week.</p>
           {trend.every((w) => w.activeStudents === 0) ? (
-            <EmptyState className="border-none bg-transparent py-4" icon={TrendingUp} title="No activity yet" />
+            <EmptyState className="border-none bg-transparent py-4" icon={BarChart3} title="No activity yet" />
           ) : (
-            <div className="flex h-32 items-end gap-2">
-              {trend.map((w) => (
-                <div key={w.weekStart} className="flex flex-1 flex-col items-center gap-1.5">
-                  <div className="flex h-24 w-full items-end">
-                    <div
-                      className="w-full rounded-t-md bg-primary transition-all"
-                      style={{ height: `${Math.max(4, (w.activeStudents / maxTrend) * 100)}%` }}
-                      title={`${w.activeStudents} active students`}
-                    />
-                  </div>
-                  <span className="text-[10px] text-muted-foreground">{format(new Date(w.weekStart), "MMM d")}</span>
-                </div>
-              ))}
-            </div>
+            <WeeklyTrendChart trend={trend} />
           )}
         </CardContent>
       </Card>
@@ -121,7 +105,7 @@ export default async function SchoolAnalyticsPage() {
       <Card>
         <CardContent>
           <p className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
-            <BarChart3 className="h-4 w-4" /> Class-level resource usage
+            <BarChart3 className="h-4 w-4 text-chart-1" /> Class-level resource usage
           </p>
           {classes.length === 0 ? (
             <EmptyState className="border-none bg-transparent py-4" icon={BarChart3} title="Nothing to show yet" />
@@ -134,7 +118,10 @@ export default async function SchoolAnalyticsPage() {
                     <span className="text-muted-foreground">{c.studentCount} students</span>
                   </div>
                   <div className="h-2.5 w-full overflow-hidden rounded-full bg-secondary">
-                    <div className="h-full rounded-full bg-primary" style={{ width: `${(c.studentCount / maxClass) * 100}%` }} />
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-chart-1/70 to-chart-1 transition-all duration-700"
+                      style={{ width: `${(c.studentCount / maxClass) * 100}%` }}
+                    />
                   </div>
                 </div>
               ))}
