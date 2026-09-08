@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { generateStudentCode } from "@/lib/student-code";
 import { ROLE_HOME } from "@/lib/nav-config";
 import type { UserRole } from "@/lib/types/database";
 
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
             role,
             first_name: meta.first_name ?? "New",
             last_name: meta.last_name ?? "User",
-            student_code: role === "student" ? Math.random().toString(36).slice(2, 8).toUpperCase() : null,
+            student_code: role === "student" ? generateStudentCode() : null,
           })
           .select("id")
           .single();

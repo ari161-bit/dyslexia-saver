@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { generateStudentCode } from "@/lib/student-code";
 import { ROLE_HOME } from "@/lib/nav-config";
 import type { UserRole } from "@/lib/types/database";
 
@@ -15,18 +16,7 @@ function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 }
 
-// Excludes visually confusable characters (0/O, 1/I/L, 8/B, 2/Z, 5/S) —
-// this code gets read aloud and typed back in by parents and teachers, so
-// on a dyslexia-support app it especially can't rely on shape alone.
-const CODE_ALPHABET = "34679ACDEFGHJKMNPQRTUVWXY";
-
-function generateCode() {
-  let code = "";
-  for (let i = 0; i < 6; i++) {
-    code += CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)];
-  }
-  return code;
-}
+const generateCode = generateStudentCode;
 
 export async function signUpAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
   const firstName = String(formData.get("firstName") ?? "").trim();
