@@ -47,8 +47,8 @@ export default async function StudentHomePage() {
         description="What do you want to do today?"
         action={
           streak.currentStreak > 0 ? (
-            <div className="flex items-center gap-2 rounded-2xl border-2 border-orange-200 bg-orange-50 px-4 py-2.5 text-orange-700">
-              <Flame className="h-5 w-5 fill-orange-500 text-orange-500" />
+            <div className="flex items-center gap-2 rounded-2xl border-2 border-orange-200 bg-orange-50 px-4 py-2.5 text-orange-700 shadow-[0_0_20px_-6px_rgba(249,115,22,0.6)]">
+              <Flame className="h-5 w-5 animate-pulse fill-orange-500 text-orange-500" />
               <span className="font-heading text-lg font-extrabold">{streak.currentStreak}</span>
               <span className="text-sm font-bold">day{streak.currentStreak === 1 ? "" : "s"} in a row</span>
             </div>
