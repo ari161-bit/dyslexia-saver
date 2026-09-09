@@ -42,20 +42,17 @@ export async function getSchoolOverviewStats(schoolId: string): Promise<SchoolOv
   const classIds = (classes ?? []).map((c) => c.id);
 
   let assignments = 0;
-  let students = 0;
+  let uniqueStudentIds: string[] = [];
   if (classIds.length > 0) {
     const [{ count: assignmentCount }, { data: roster }] = await Promise.all([
       supabase.from("bp_assignments").select("id", { count: "exact", head: true }).in("class_id", classIds),
       supabase.from("bp_class_members").select("student_id").in("class_id", classIds),
     ]);
     assignments = assignmentCount ?? 0;
-    students = new Set((roster ?? []).map((r) => r.student_id)).size;
+    uniqueStudentIds = Array.from(new Set((roster ?? []).map((r) => r.student_id)));
   }
+  const students = uniqueStudentIds.length;
 
-  const studentIdsForPrefs = classIds.length
-    ? (await supabase.from("bp_class_members").select("student_id").in("class_id", classIds)).data ?? []
-    : [];
-  const uniqueStudentIds = Array.from(new Set(studentIdsForPrefs.map((r) => r.student_id)));
   const { count: accessibilityUsage } = uniqueStudentIds.length
     ? await supabase.from("bp_reading_preferences").select("user_id", { count: "exact", head: true }).in("user_id", uniqueStudentIds)
     : { count: 0 };

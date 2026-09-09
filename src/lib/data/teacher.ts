@@ -47,25 +47,27 @@ export async function getStudentsNeedingAttention(teacherId: string): Promise<St
     .select("student_id, class_id, bp_profiles(first_name, last_name)")
     .in("class_id", classIds);
 
+  const studentIds = Array.from(new Set((roster ?? []).map((r) => r.student_id)));
+
+  // One query for every roster student's recent activity instead of one
+  // query per student — same result, doesn't scale linearly with roster size.
+  const { data: recentEvents } = studentIds.length
+    ? await supabase.from("bp_progress_events").select("student_id").in("student_id", studentIds).gte("created_at", since.toISOString())
+    : { data: [] };
+  const activeStudentIds = new Set((recentEvents ?? []).map((e) => e.student_id));
+
   const classById = new Map((classes ?? []).map((c) => [c.id, c.name]));
   const results: StudentNeedingAttention[] = [];
 
   for (const member of roster ?? []) {
-    const { count } = await supabase
-      .from("bp_progress_events")
-      .select("id", { count: "exact", head: true })
-      .eq("student_id", member.student_id)
-      .gte("created_at", since.toISOString());
-
-    if ((count ?? 0) === 0) {
-      const profile = member.bp_profiles as unknown as { first_name: string; last_name: string } | null;
-      results.push({
-        studentId: member.student_id,
-        name: profile ? `${profile.first_name} ${profile.last_name}` : "Student",
-        className: classById.get(member.class_id) ?? "Class",
-        reason: "May benefit from additional support — no recent activity",
-      });
-    }
+    if (activeStudentIds.has(member.student_id)) continue;
+    const profile = member.bp_profiles as unknown as { first_name: string; last_name: string } | null;
+    results.push({
+      studentId: member.student_id,
+      name: profile ? `${profile.first_name} ${profile.last_name}` : "Student",
+      className: classById.get(member.class_id) ?? "Class",
+      reason: "May benefit from additional support — no recent activity",
+    });
   }
 
   return results.slice(0, 6);
@@ -229,21 +231,30 @@ export async function getClassProgressSummaries(teacherId: string): Promise<Clas
   const since = new Date();
   since.setDate(since.getDate() - 7);
 
-  const summaries: ClassProgressSummary[] = [];
-  for (const c of classes ?? []) {
-    const studentIds = (c.bp_class_members as unknown as { student_id: string }[]).map((m) => m.student_id);
-    let activities = 0;
-    if (studentIds.length > 0) {
-      const { count } = await supabase
-        .from("bp_progress_events")
-        .select("id", { count: "exact", head: true })
-        .in("student_id", studentIds)
-        .gte("created_at", since.toISOString());
-      activities = count ?? 0;
-    }
-    summaries.push({ classId: c.id, className: c.name, studentCount: studentIds.length, activitiesLast7Days: activities });
+  const classRosters = (classes ?? []).map((c) => ({
+    id: c.id,
+    name: c.name,
+    studentIds: (c.bp_class_members as unknown as { student_id: string }[]).map((m) => m.student_id),
+  }));
+  const allStudentIds = Array.from(new Set(classRosters.flatMap((c) => c.studentIds)));
+
+  // One query for every class's activity instead of one query per class —
+  // a teacher with 20 classes no longer means 20 sequential round-trips.
+  const { data: events } = allStudentIds.length
+    ? await supabase.from("bp_progress_events").select("student_id").in("student_id", allStudentIds).gte("created_at", since.toISOString())
+    : { data: [] };
+
+  const activityCountByStudent = new Map<string, number>();
+  for (const e of events ?? []) {
+    activityCountByStudent.set(e.student_id, (activityCountByStudent.get(e.student_id) ?? 0) + 1);
   }
-  return summaries;
+
+  return classRosters.map((c) => ({
+    classId: c.id,
+    className: c.name,
+    studentCount: c.studentIds.length,
+    activitiesLast7Days: c.studentIds.reduce((sum, id) => sum + (activityCountByStudent.get(id) ?? 0), 0),
+  }));
 }
 
 export async function getAllTeacherAssignments(teacherId: string): Promise<RecentAssignment[]> {
