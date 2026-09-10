@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { Building2 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -20,11 +21,15 @@ export default async function SchoolClassesPage() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {classes.map((c) => (
-            <div key={c.id} className="rounded-2xl border border-border/70 bg-card p-4">
+            <Link
+              key={c.id}
+              href={`/school/classes/${c.id}`}
+              className="rounded-2xl border border-border/70 bg-card p-4 transition-colors hover:border-primary/40 hover:bg-accent/30"
+            >
               <p className="font-heading font-semibold">{c.name}</p>
               <p className="mt-0.5 text-sm text-muted-foreground">{c.subject ?? "General"} {c.grade ? `· ${c.grade}` : ""}</p>
               <p className="mt-3 text-xs text-muted-foreground">{c.teacherName} · {c.studentCount} students</p>
-            </div>
+            </Link>
           ))}
         </div>
       )}

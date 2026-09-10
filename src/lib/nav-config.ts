@@ -30,6 +30,7 @@ export interface NavItem {
 export const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
   student: [
     { label: "Home", href: "/student", icon: Home },
+    { label: "Classroom", href: "/student/classroom", icon: GraduationCap },
     { label: "My Learning", href: "/student/learning", icon: BookOpen },
     { label: "Practice", href: "/student/practice", icon: Sparkles },
     { label: "Assignments", href: "/student/assignments", icon: ClipboardList },

@@ -282,6 +282,46 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["bp_reading_preferences"]["Row"]>;
         Relationships: [];
       };
+      bp_class_posts: {
+        Row: {
+          id: string;
+          class_id: string;
+          author_id: string;
+          body: string;
+          link_url: string | null;
+          image_url: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          class_id: string;
+          author_id: string;
+          body: string;
+          link_url?: string | null;
+          image_url?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["bp_class_posts"]["Insert"]>;
+        Relationships: [];
+      };
+      bp_post_comments: {
+        Row: {
+          id: string;
+          post_id: string;
+          author_id: string;
+          body: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          post_id: string;
+          author_id: string;
+          body: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["bp_post_comments"]["Insert"]>;
+        Relationships: [];
+      };
       bp_notes: {
         Row: {
           id: string;
