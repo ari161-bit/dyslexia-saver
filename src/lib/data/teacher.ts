@@ -1,5 +1,5 @@
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 
 export interface TeacherClassCard {
   id: string;
@@ -162,7 +162,13 @@ export async function getStudentProfileForTeacher(teacherId: string, studentId: 
     .order("created_at", { ascending: false })
     .limit(10);
 
-  const { data: pendingLinks } = await supabase
+  // bp_parent_student_links has no SELECT policy for teachers/school admins
+  // at all (only "parent views own" and "student views own") — the `match`
+  // check above already proved this student is on the teacher's own
+  // roster, so this one read is safe via the service-role client, which is
+  // the only way it would ever return rows for a teacher today.
+  const admin = createServiceRoleClient();
+  const { data: pendingLinks } = await admin
     .from("bp_parent_student_links")
     .select("id, bp_profiles!bp_parent_student_links_parent_id_fkey(first_name, last_name)")
     .eq("student_id", studentId)
