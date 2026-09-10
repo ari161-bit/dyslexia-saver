@@ -32,6 +32,7 @@ export interface Database {
           last_name: string;
           avatar_url: string | null;
           student_code: string | null;
+          school_id: string | null;
           created_at: string;
         };
         Insert: {
@@ -42,6 +43,7 @@ export interface Database {
           last_name: string;
           avatar_url?: string | null;
           student_code?: string | null;
+          school_id?: string | null;
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["bp_profiles"]["Insert"]>;

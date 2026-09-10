@@ -1,5 +1,5 @@
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 
 export interface StreamComment {
   id: string;
@@ -72,6 +72,25 @@ export async function getClassBasicInfo(classId: string): Promise<ClassBasicInfo
   const supabase = await createClient();
   const { data } = await supabase.from("bp_classes").select("id, name, subject").eq("id", classId).maybeSingle();
   return data;
+}
+
+export interface ClassRosterEntry {
+  studentId: string;
+  name: string;
+}
+
+// School admin's view of a class roster. Regular RLS has no school_admin
+// SELECT policy on bp_class_members or student bp_profiles (only
+// teacher/student/parent do), so this reads via service role — the caller
+// must already have verified this classId belongs to the admin's own school.
+export async function getClassRoster(classId: string): Promise<ClassRosterEntry[]> {
+  const supabase = createServiceRoleClient();
+  const { data } = await supabase
+    .from("bp_class_members")
+    .select("student_id, bp_profiles(first_name, last_name)")
+    .eq("class_id", classId);
+
+  return (data ?? []).map((r) => ({ studentId: r.student_id, name: profileName(r.bp_profiles) }));
 }
 
 export interface StudentClassSummary {
