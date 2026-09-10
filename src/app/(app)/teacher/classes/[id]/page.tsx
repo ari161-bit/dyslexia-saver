@@ -1,19 +1,22 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
-import { ClipboardList, Plus, Users } from "lucide-react";
+import { ClipboardList, MessageCircle, Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { CopyCodeButton } from "@/components/classes/copy-code-button";
 import { InviteStudentDialog } from "@/components/classes/invite-student-dialog";
 import { BulkInviteDialog } from "@/components/classes/bulk-invite-dialog";
+import { ClassStream } from "@/components/classes/class-stream";
 import { getClassDetail } from "@/lib/data/teacher";
+import { getClassStream } from "@/lib/data/class-stream";
 
 export default async function TeacherClassDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const detail = await getClassDetail(id);
+  const [detail, stream] = await Promise.all([getClassDetail(id), getClassStream(id)]);
   if (!detail) notFound();
 
   return (
@@ -30,6 +33,17 @@ export default async function TeacherClassDetailPage({ params }: { params: Promi
         }
       />
 
+      <Tabs defaultValue="stream">
+        <TabsList>
+          <TabsTrigger value="stream"><MessageCircle className="h-3.5 w-3.5" /> Stream</TabsTrigger>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="stream" className="pt-5">
+          <ClassStream classId={id} posts={stream} canPost />
+        </TabsContent>
+
+        <TabsContent value="overview" className="space-y-6 pt-5">
       <Card>
         <CardContent className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -98,6 +112,8 @@ export default async function TeacherClassDetailPage({ params }: { params: Promi
           </CardContent>
         </Card>
       </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
