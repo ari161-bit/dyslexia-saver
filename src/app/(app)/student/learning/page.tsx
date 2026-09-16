@@ -52,7 +52,7 @@ export default async function MyLearningPage() {
           {resources.map((r) => (
             <ResourceCard
               key={r.id}
-              href={`/read/${r.id}`}
+              href={`/lesson/${r.id}`}
               title={r.title}
               subject={r.subject}
               status={r.status}

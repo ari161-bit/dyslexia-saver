@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { BookOpen, ClipboardList, Ear, FileUp, Flame, Sparkles } from "lucide-react";
+import { BookOpen, ClipboardList, Ear, FileUp, Flame, Sparkles, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -12,13 +12,17 @@ import { getContinueLearning, getUpcomingAssignments, getWeeklyProgress, getStud
 
 export const metadata: Metadata = { title: "Home" };
 
-const QUICK_ACTIONS = [
-  { href: "/student/learning?mode=read", label: "Read something", icon: BookOpen, color: "bg-chart-1/15 text-chart-1" },
-  { href: "/student/learning/upload", label: "Upload a page", icon: FileUp, color: "bg-chart-2/15 text-chart-2" },
-  { href: "/student/learning?mode=listen", label: "Listen", icon: Ear, color: "bg-chart-3/15 text-chart-3" },
-  { href: "/student/practice", label: "Ask for help", icon: Sparkles, color: "bg-chart-4/15 text-chart-4" },
-  { href: "/student/practice", label: "Practice time", icon: ClipboardList, color: "bg-success/15 text-success" },
-];
+function buildQuickActions(demoResourceId: string | null) {
+  const lesson = (tab: string) => (demoResourceId ? `/lesson/${demoResourceId}?tab=${tab}` : "/student/learning");
+  return [
+    { href: lesson("read"), label: "Read it clearer", icon: BookOpen, color: "bg-chart-1/15 text-chart-1" },
+    { href: lesson("listen"), label: "Listen to it", icon: Ear, color: "bg-chart-3/15 text-chart-3" },
+    { href: lesson("simplify"), label: "Simplify it", icon: Wand2, color: "bg-chart-2/15 text-chart-2" },
+    { href: lesson("practice"), label: "Practise it", icon: Sparkles, color: "bg-success/15 text-success" },
+    { href: "/student/learning/upload", label: "Upload a page", icon: FileUp, color: "bg-chart-4/15 text-chart-4" },
+    { href: "/student/assignments", label: "My to-dos", icon: ClipboardList, color: "bg-chart-1/15 text-chart-1" },
+  ];
+}
 
 function greeting() {
   const hour = new Date().getHours();
@@ -38,6 +42,8 @@ export default async function StudentHomePage() {
     getStudentStreak(profile.id),
     getStudentBadges(profile.id),
   ]);
+
+  const quickActions = buildQuickActions(continueLearning?.resourceId ?? null);
 
   return (
     <div className="space-y-8">
@@ -70,7 +76,7 @@ export default async function StudentHomePage() {
                     ) : null}
                   </div>
                   <Button asChild className="h-12 rounded-2xl px-6 text-base font-bold">
-                    <Link href={`/read/${continueLearning.resourceId}`}>Keep going →</Link>
+                    <Link href={`/lesson/${continueLearning.resourceId}`}>Keep going →</Link>
                   </Button>
                 </div>
               ) : (
@@ -128,7 +134,7 @@ export default async function StudentHomePage() {
             <CardContent className="p-6">
               <p className="text-base font-bold text-primary">✨ Let&apos;s go!</p>
               <div className="mt-4 grid grid-cols-1 gap-2.5">
-                {QUICK_ACTIONS.map(({ href, label, icon: Icon, color }) => (
+                {quickActions.map(({ href, label, icon: Icon, color }) => (
                   <Link
                     key={label}
                     href={href}

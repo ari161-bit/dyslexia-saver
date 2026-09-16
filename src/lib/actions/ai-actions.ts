@@ -46,6 +46,29 @@ export async function lookupWordAction(word: string, context: string): Promise<V
   }
 }
 
+export interface SimplifyResult {
+  paragraphs?: string[];
+  error?: string;
+}
+
+// A live, on-demand version of the same rewrite used in the teacher's
+// adaptation workspace (ai.adaptText) — shown straight to the student here
+// instead of going through the teacher-approval pipeline, since this is a
+// side-by-side preview, not the persisted "official" adapted version.
+export async function simplifyTextAction(text: string): Promise<SimplifyResult> {
+  const user = await getCurrentUser();
+  if (!user?.profile) return { error: "Please sign in." };
+  if (!text.trim()) return { error: "Nothing to simplify yet." };
+
+  try {
+    const ai = getAIService(user.profile.id);
+    const result = await ai.adaptText({ text });
+    return { paragraphs: result.data.sections.flatMap((s) => s.paragraphs) };
+  } catch {
+    return { error: "Couldn't simplify this right now. Try again shortly." };
+  }
+}
+
 export interface PracticeResult {
   questions?: { question: string; answer: string; sourceQuote: string }[];
   error?: string;
