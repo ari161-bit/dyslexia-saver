@@ -73,6 +73,75 @@ export async function getStudentsNeedingAttention(teacherId: string): Promise<St
   return results.slice(0, 6);
 }
 
+export interface StrugglePattern {
+  resourceId: string;
+  resourceTitle: string;
+  className: string;
+  strugglingCount: number;
+}
+
+// Observed data only, never a fabricated claim: a student counts as
+// "struggling" with a resource if they answered a practice question wrong
+// on it, or told BrightPath directly (via the confidence check-in) that
+// they found it difficult or needed help. Only surfaces a resource once at
+// least two students show the same pattern, so a single off day doesn't
+// read as a class-wide problem.
+export async function getClassStrugglePatterns(teacherId: string): Promise<StrugglePattern[]> {
+  const supabase = await createClient();
+  const { data: classes } = await supabase.from("bp_classes").select("id, name").eq("teacher_id", teacherId);
+  const classIds = (classes ?? []).map((c) => c.id);
+  if (classIds.length === 0) return [];
+
+  const { data: roster } = await supabase.from("bp_class_members").select("student_id, class_id").in("class_id", classIds);
+  const studentIds = Array.from(new Set((roster ?? []).map((r) => r.student_id)));
+  if (studentIds.length === 0) return [];
+
+  const since = new Date();
+  since.setDate(since.getDate() - 14);
+  const { data: events } = await supabase
+    .from("bp_progress_events")
+    .select("student_id, resource_id, event_type, metadata")
+    .in("student_id", studentIds)
+    .not("resource_id", "is", null)
+    .gte("created_at", since.toISOString());
+
+  const classByStudent = new Map((roster ?? []).map((r) => [r.student_id, r.class_id]));
+  const classNameById = new Map((classes ?? []).map((c) => [c.id, c.name]));
+  const strugglingStudentsByResource = new Map<string, Set<string>>();
+
+  for (const e of events ?? []) {
+    if (!e.resource_id) continue;
+    const metadata = e.metadata as { correct?: boolean; level?: string } | null;
+    const struggled =
+      (e.event_type === "practice_completed" && metadata?.correct === false) ||
+      (e.event_type === "confidence_reflection" && (metadata?.level === "difficult" || metadata?.level === "needed_help"));
+    if (!struggled) continue;
+    const set = strugglingStudentsByResource.get(e.resource_id) ?? new Set<string>();
+    set.add(e.student_id);
+    strugglingStudentsByResource.set(e.resource_id, set);
+  }
+
+  const patterns = Array.from(strugglingStudentsByResource.entries()).filter(([, students]) => students.size >= 2);
+  if (patterns.length === 0) return [];
+
+  const resourceIds = patterns.map(([resourceId]) => resourceId);
+  const { data: resources } = await supabase.from("bp_resources").select("id, title").in("id", resourceIds);
+  const titleById = new Map((resources ?? []).map((r) => [r.id, r.title]));
+
+  return patterns
+    .map(([resourceId, students]) => {
+      const firstClassId = classByStudent.get(Array.from(students)[0]);
+      return {
+        resourceId,
+        resourceTitle: titleById.get(resourceId) ?? "a lesson",
+        className: (firstClassId && classNameById.get(firstClassId)) ?? "your class",
+        strugglingCount: students.size,
+      };
+    })
+    .sort((a, b) => b.strugglingCount - a.strugglingCount)
+    .slice(0, 4);
+}
+
 export interface RecentAssignment {
   id: string;
   title: string;

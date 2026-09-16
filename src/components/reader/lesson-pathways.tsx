@@ -1,19 +1,27 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   BookOpenText,
   CheckCircle2,
   Ear,
+  Frown,
+  HelpCircle,
+  Lightbulb,
+  ListChecks,
   Loader2,
+  Meh,
   Pause,
   Play,
   RefreshCw,
+  Smile,
   Sparkles,
+  SpellCheck,
   Wand2,
+  X,
   XCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,10 +32,20 @@ import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { generatePracticeAction, simplifyTextAction } from "@/lib/actions/ai-actions";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  explainSelectionAction,
+  generatePracticeAction,
+  getKeyIdeasAction,
+  getVocabularyListAction,
+  simplifyTextAction,
+} from "@/lib/actions/ai-actions";
+import { recordProgressEventAction } from "@/lib/actions/progress";
 import { fleschReadingEase } from "@/lib/readability";
 import { cn } from "@/lib/utils";
 import type { Tables } from "@/lib/types/database";
+
+type TabValue = "read" | "listen" | "simplify" | "ideas" | "vocabulary" | "practice";
 
 interface QAItem {
   question: string;
@@ -47,6 +65,26 @@ const PHOTOSYNTHESIS_SIMPLIFIED = [
   "The plant mixes that light energy with water and air. This makes sugar (glucose) and oxygen.",
   "The plant lets oxygen out into the air. Living things need that oxygen to breathe.",
   "Without photosynthesis, most living things would have no food.",
+];
+
+const PHOTOSYNTHESIS_KEY_IDEAS = {
+  summary:
+    "Plants make their own food through photosynthesis, using sunlight, water, and carbon dioxide to produce glucose and oxygen.",
+  keyPoints: [
+    "Photosynthesis happens mainly inside the leaves.",
+    "Chloroplasts are the tiny green parts where it happens.",
+    "Chlorophyll captures light energy from the sun.",
+    "The plant combines that energy with water and carbon dioxide.",
+    "The process makes glucose (the plant's food) and oxygen.",
+    "Oxygen is released into the air — other living things need it to breathe.",
+  ],
+};
+
+const PHOTOSYNTHESIS_VOCAB = [
+  { term: "Photosynthesis", definition: "The process plants use to make their own food from sunlight.", example: "This process is called photosynthesis." },
+  { term: "Chlorophyll", definition: "The green substance in leaves that captures light energy.", example: "Chlorophyll, the green pigment in chloroplasts, captures light energy." },
+  { term: "Chloroplast", definition: "A tiny green part inside a plant cell where photosynthesis happens.", example: "It happens mostly in the leaves, inside tiny green parts called chloroplasts." },
+  { term: "Glucose", definition: "A type of sugar that plants make and use for energy.", example: "...to produce glucose and oxygen." },
 ];
 
 const PHOTOSYNTHESIS_QA: QAItem[] = [
@@ -82,6 +120,15 @@ function checkAnswer(response: string, accept: string[]) {
   return accept.some((keyword) => normalized.includes(keyword));
 }
 
+const TAB_META: { value: TabValue; label: string; icon: typeof BookOpenText }[] = [
+  { value: "read", label: "Read clearer", icon: BookOpenText },
+  { value: "listen", label: "Listen", icon: Ear },
+  { value: "simplify", label: "Simplify", icon: Wand2 },
+  { value: "ideas", label: "Key ideas", icon: Lightbulb },
+  { value: "vocabulary", label: "Vocabulary", icon: SpellCheck },
+  { value: "practice", label: "Practise", icon: Sparkles },
+];
+
 export function LessonPathways({
   resource,
   fullText,
@@ -92,13 +139,15 @@ export function LessonPathways({
   initialTab?: string;
 }) {
   const isDemo = isDemoLesson(resource.title);
+  const [tab, setTab] = useState<TabValue>((TAB_META.find((t) => t.value === initialTab)?.value ?? "read") as TabValue);
+  const [clearer, setClearer] = useState(false);
   const paragraphs = useMemo(
     () => (fullText.trim() ? fullText.split(/\n+/).filter(Boolean) : ["This resource is still processing."]),
     [fullText],
   );
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 px-4 py-8">
+    <div className="relative mx-auto max-w-4xl space-y-6 px-4 py-8">
       <div className="flex items-center justify-between gap-3">
         <Link href="/student/learning" className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Back
@@ -112,7 +161,7 @@ export function LessonPathways({
         <div>
           <h1 className="font-heading text-2xl font-bold sm:text-3xl">{resource.title}</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            One lesson, four ways in — read it clearer, listen to it, simplify it, or practise it.
+            One lesson, six ways in — read it clearer, listen, simplify, get the key ideas, check vocabulary, or practise.
           </p>
         </div>
         <Link href={`/read/${resource.id}`} className="text-xs font-medium text-primary hover:underline">
@@ -120,16 +169,17 @@ export function LessonPathways({
         </Link>
       </div>
 
-      <Tabs defaultValue={initialTab}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="read"><BookOpenText className="h-3.5 w-3.5" /> Read clearer</TabsTrigger>
-          <TabsTrigger value="listen"><Ear className="h-3.5 w-3.5" /> Listen</TabsTrigger>
-          <TabsTrigger value="simplify"><Wand2 className="h-3.5 w-3.5" /> Simplify</TabsTrigger>
-          <TabsTrigger value="practice"><Sparkles className="h-3.5 w-3.5" /> Practise</TabsTrigger>
+      <Tabs value={tab} onValueChange={(v) => setTab(v as TabValue)}>
+        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6">
+          {TAB_META.map(({ value, label, icon: Icon }) => (
+            <TabsTrigger key={value} value={value}>
+              <Icon className="h-3.5 w-3.5" /> {label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
         <TabsContent value="read" className="pt-5">
-          <ReadClearerTab paragraphs={paragraphs} />
+          <ReadClearerTab paragraphs={paragraphs} clearer={clearer} setClearer={setClearer} />
         </TabsContent>
         <TabsContent value="listen" className="pt-5">
           <ListenTab fullText={fullText} />
@@ -137,17 +187,31 @@ export function LessonPathways({
         <TabsContent value="simplify" className="pt-5">
           <SimplifyTab paragraphs={paragraphs} fullText={fullText} isDemo={isDemo} />
         </TabsContent>
+        <TabsContent value="ideas" className="pt-5">
+          <KeyIdeasTab fullText={fullText} isDemo={isDemo} />
+        </TabsContent>
+        <TabsContent value="vocabulary" className="pt-5">
+          <VocabularyTab fullText={fullText} isDemo={isDemo} />
+        </TabsContent>
         <TabsContent value="practice" className="pt-5">
-          <PracticeTab fullText={fullText} isDemo={isDemo} />
+          <PracticeTab resourceId={resource.id} fullText={fullText} isDemo={isDemo} />
         </TabsContent>
       </Tabs>
+
+      <HelpMeButton fullText={fullText} onGoTo={(t) => setTab(t)} onWantsClearer={() => setClearer(true)} />
     </div>
   );
 }
 
-function ReadClearerTab({ paragraphs }: { paragraphs: string[] }) {
-  const [clearer, setClearer] = useState(false);
-
+function ReadClearerTab({
+  paragraphs,
+  clearer,
+  setClearer,
+}: {
+  paragraphs: string[];
+  clearer: boolean;
+  setClearer: (v: boolean) => void;
+}) {
   return (
     <div className="space-y-4">
       <Card>
@@ -355,7 +419,99 @@ function ReadingEaseBadge({ score, grade, highlight }: { score: number; grade: s
   );
 }
 
-function PracticeTab({ fullText, isDemo }: { fullText: string; isDemo: boolean }) {
+function KeyIdeasTab({ fullText, isDemo }: { fullText: string; isDemo: boolean }) {
+  const [data, setData] = useState<{ summary: string; keyPoints: string[] } | null>(isDemo ? PHOTOSYNTHESIS_KEY_IDEAS : null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function run() {
+    setLoading(true);
+    setError(null);
+    const result = await getKeyIdeasAction(fullText);
+    setLoading(false);
+    if (result.error) setError(result.error);
+    else setData({ summary: result.summary ?? "", keyPoints: result.keyPoints ?? [] });
+  }
+
+  if (!data) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center gap-3 py-8 text-center">
+          <Lightbulb className="h-8 w-8 text-primary" />
+          <p className="font-heading text-lg font-semibold">Pull out the key ideas</p>
+          <p className="max-w-sm text-sm text-muted-foreground">A short summary and the main points, grounded in this exact lesson.</p>
+          <Button onClick={run} disabled={loading}>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            Show key ideas
+          </Button>
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-4 rounded-2xl border-2 border-border bg-card p-6">
+      <p className="text-base leading-relaxed">{data.summary}</p>
+      <ul className="space-y-2">
+        {data.keyPoints.map((point, i) => (
+          <li key={i} className="flex items-start gap-2.5 text-sm">
+            <ListChecks className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <span>{point}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function VocabularyTab({ fullText, isDemo }: { fullText: string; isDemo: boolean }) {
+  const [entries, setEntries] = useState<{ term: string; definition: string; example: string }[] | null>(
+    isDemo ? PHOTOSYNTHESIS_VOCAB : null,
+  );
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function run() {
+    setLoading(true);
+    setError(null);
+    const result = await getVocabularyListAction(fullText);
+    setLoading(false);
+    if (result.error) setError(result.error);
+    else setEntries(result.entries ?? []);
+  }
+
+  if (!entries) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center gap-3 py-8 text-center">
+          <SpellCheck className="h-8 w-8 text-primary" />
+          <p className="font-heading text-lg font-semibold">Check tricky vocabulary</p>
+          <p className="max-w-sm text-sm text-muted-foreground">Plain-language definitions for words in this lesson that might trip you up.</p>
+          <Button onClick={run} disabled={loading}>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            Show vocabulary
+          </Button>
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {entries.map((e, i) => (
+        <div key={i} className="rounded-2xl border-2 border-border bg-card p-5">
+          <p className="font-heading text-base font-bold text-primary">{e.term}</p>
+          <p className="mt-1 text-sm">{e.definition}</p>
+          {e.example ? <p className="mt-2 text-sm italic text-muted-foreground">&ldquo;{e.example}&rdquo;</p> : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PracticeTab({ resourceId, fullText, isDemo }: { resourceId: string; fullText: string; isDemo: boolean }) {
   const [aiQuestions, setAiQuestions] = useState<{ question: string; answer: string; sourceQuote: string }[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [index, setIndex] = useState(0);
@@ -380,7 +536,9 @@ function PracticeTab({ fullText, isDemo }: { fullText: string; isDemo: boolean }
 
   function check() {
     if (!current) return;
-    setChecked(checkAnswer(response, current.accept) ? "correct" : "incorrect");
+    const correct = checkAnswer(response, current.accept);
+    setChecked(correct ? "correct" : "incorrect");
+    recordProgressEventAction("practice_completed", resourceId, { correct });
   }
 
   function next() {
@@ -407,22 +565,25 @@ function PracticeTab({ fullText, isDemo }: { fullText: string; isDemo: boolean }
 
   if (!current) {
     return (
-      <Card>
-        <CardContent className="flex flex-col items-center gap-3 py-8 text-center">
-          <CheckCircle2 className="h-8 w-8 text-success" />
-          <p className="font-heading text-lg font-semibold">You finished the set!</p>
-          <Button
-            onClick={() => {
-              setIndex(0);
-              setChecked(null);
-              setResponse("");
-              if (!isDemo) generate();
-            }}
-          >
-            <RefreshCw className="h-4 w-4" /> Practice again
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="space-y-4">
+        <Card>
+          <CardContent className="flex flex-col items-center gap-3 py-8 text-center">
+            <CheckCircle2 className="h-8 w-8 text-success" />
+            <p className="font-heading text-lg font-semibold">You finished the set!</p>
+            <Button
+              onClick={() => {
+                setIndex(0);
+                setChecked(null);
+                setResponse("");
+                if (!isDemo) generate();
+              }}
+            >
+              <RefreshCw className="h-4 w-4" /> Practice again
+            </Button>
+          </CardContent>
+        </Card>
+        <ConfidenceCheckIn resourceId={resourceId} />
+      </div>
     );
   }
 
@@ -460,5 +621,146 @@ function PracticeTab({ fullText, isDemo }: { fullText: string; isDemo: boolean }
         )}
       </div>
     </div>
+  );
+}
+
+const CONFIDENCE_LEVELS = [
+  { level: "understood", label: "I understood this", icon: Smile },
+  { level: "needed_help", label: "I needed some help", icon: Meh },
+  { level: "difficult", label: "I found this difficult", icon: Frown },
+] as const;
+
+// Not another grade — a direct signal of how the lesson FELT, separate from
+// whether the answers were right. A student can get a question wrong but
+// still say "I understood this" (a slip, not a comprehension gap), or get
+// it right while saying "I needed help" (guessed, or it took real effort).
+// That distinction is what teachers actually need to tell "wrong answer"
+// apart from "the format got in the way."
+function ConfidenceCheckIn({ resourceId }: { resourceId: string }) {
+  const [picked, setPicked] = useState<string | null>(null);
+
+  function pick(level: string) {
+    setPicked(level);
+    recordProgressEventAction("confidence_reflection", resourceId, { level });
+  }
+
+  if (picked) {
+    return (
+      <div className="rounded-2xl border border-border/70 bg-muted/40 p-4 text-center text-sm text-muted-foreground">
+        Thanks — that helps your teacher understand how this lesson felt, not just the score.
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border-2 border-border bg-card p-5">
+      <p className="text-sm font-semibold text-muted-foreground">How did that feel?</p>
+      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+        {CONFIDENCE_LEVELS.map(({ level, label, icon: Icon }) => (
+          <button
+            key={level}
+            onClick={() => pick(level)}
+            className="flex flex-col items-center gap-2 rounded-xl border-2 border-border/70 px-3 py-3 text-sm font-medium transition-colors hover:border-primary/40 hover:bg-accent/30"
+          >
+            <Icon className="h-5 w-5" />
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const HELP_OPTIONS: { label: string; action: "simplify" | "read" | "vocabulary" | "practice" | "example" }[] = [
+  { label: "I can't understand this", action: "simplify" },
+  { label: "I can't read this easily", action: "read" },
+  { label: "I don't know this word", action: "vocabulary" },
+  { label: "I don't understand the question", action: "practice" },
+  { label: "I need an example", action: "example" },
+];
+
+function HelpMeButton({
+  fullText,
+  onGoTo,
+  onWantsClearer,
+}: {
+  fullText: string;
+  onGoTo: (tab: TabValue) => void;
+  onWantsClearer: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [example, setExample] = useState<string | null>(null);
+  const [exampleLoading, setExampleLoading] = useState(false);
+
+  async function handle(action: (typeof HELP_OPTIONS)[number]["action"]) {
+    setOpen(false);
+    if (action === "simplify") onGoTo("simplify");
+    else if (action === "vocabulary") onGoTo("vocabulary");
+    else if (action === "practice") onGoTo("practice");
+    else if (action === "read") {
+      onGoTo("read");
+      onWantsClearer();
+    } else if (action === "example") {
+      setExampleLoading(true);
+      setExample(null);
+      const result = await explainSelectionAction(fullText, "Give one simple, relatable example that helps explain this lesson.");
+      setExampleLoading(false);
+      setExample(result.explanation ?? result.error ?? "Couldn't find an example right now.");
+    }
+  }
+
+  return (
+    <>
+      <div className="fixed bottom-6 right-6 z-30">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button size="lg" className="h-14 rounded-full px-5 shadow-lg">
+              <HelpCircle className="h-5 w-5" /> Help me
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-72 p-2">
+            <p className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">I&apos;m stuck…</p>
+            <div className="space-y-1">
+              {HELP_OPTIONS.map((opt) => (
+                <button
+                  key={opt.label}
+                  onClick={() => handle(opt.action)}
+                  className="block w-full rounded-lg px-2.5 py-2 text-left text-sm transition-colors hover:bg-accent"
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      <AnimatePresence>
+        {exampleLoading || example ? (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 12 }}
+            className="fixed bottom-24 left-1/2 z-30 w-[92%] max-w-md -translate-x-1/2 rounded-2xl border border-border bg-popover p-4 text-popover-foreground shadow-xl"
+          >
+            <div className="mb-2 flex items-center justify-between">
+              <p className="flex items-center gap-1.5 text-sm font-semibold">
+                <Sparkles className="h-4 w-4 text-primary" /> Here&apos;s an example
+              </p>
+              <button onClick={() => setExample(null)} aria-label="Close" className="text-muted-foreground hover:text-foreground">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            {exampleLoading ? (
+              <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Thinking of one...
+              </p>
+            ) : (
+              <p className="whitespace-pre-line text-sm">{example}</p>
+            )}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </>
   );
 }

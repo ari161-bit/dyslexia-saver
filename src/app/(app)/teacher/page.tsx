@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { format } from "date-fns";
-import { FolderOpen, GraduationCap, LifeBuoy, Plus, Upload, Users } from "lucide-react";
+import { AlertTriangle, FolderOpen, GraduationCap, LifeBuoy, Plus, Upload, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { ResourceCard } from "@/components/shared/resource-card";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import {
+  getClassStrugglePatterns,
   getRecentAssignments,
   getRecentResources,
   getStudentsNeedingAttention,
@@ -22,11 +23,12 @@ export default async function TeacherDashboardPage() {
   const user = await getCurrentUser();
   const profile = user!.profile!;
 
-  const [classes, attention, assignments, resources] = await Promise.all([
+  const [classes, attention, assignments, resources, strugglePatterns] = await Promise.all([
     getTeacherClasses(profile.id),
     getStudentsNeedingAttention(profile.id),
     getRecentAssignments(profile.id),
     getRecentResources(profile.id),
+    getClassStrugglePatterns(profile.id),
   ]);
 
   return (
@@ -84,7 +86,7 @@ export default async function TeacherDashboardPage() {
               <LifeBuoy className="h-4 w-4" /> Students Needing Attention
             </p>
             {attention.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Everyone's been actively engaged recently — nice work.</p>
+              <p className="text-sm text-muted-foreground">Everyone&apos;s been actively engaged recently — nice work.</p>
             ) : (
               <div className="space-y-2">
                 {attention.map((s) => (
@@ -132,6 +134,32 @@ export default async function TeacherDashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {strugglePatterns.length > 0 ? (
+        <Card className="border-destructive/30 bg-destructive/5">
+          <CardContent>
+            <p className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-destructive">
+              <AlertTriangle className="h-4 w-4" /> Needs attention — observed this week
+            </p>
+            <p className="mb-3 text-xs text-muted-foreground">
+              Based on wrong practice answers and students&apos; own &ldquo;I found this difficult&rdquo; check-ins — not a guess.
+            </p>
+            <div className="space-y-2">
+              {strugglePatterns.map((p) => (
+                <div key={p.resourceId} className="flex items-center justify-between rounded-xl border border-border/60 bg-card px-3 py-2.5 text-sm">
+                  <div>
+                    <p className="font-medium">{p.resourceTitle}</p>
+                    <p className="text-xs text-muted-foreground">{p.className}</p>
+                  </div>
+                  <Badge variant="secondary" className="font-normal">
+                    {p.strugglingCount} student{p.strugglingCount === 1 ? "" : "s"} struggled
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
 
       <div>
         <div className="mb-3 flex items-center justify-between">

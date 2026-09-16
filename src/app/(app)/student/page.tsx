@@ -8,7 +8,14 @@ import { PageHeader } from "@/components/shared/page-header";
 import { AssignmentRow } from "@/components/shared/assignment-row";
 import { BadgeGrid } from "@/components/student/badge-grid";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
-import { getContinueLearning, getUpcomingAssignments, getWeeklyProgress, getStudentStreak, getStudentBadges } from "@/lib/data/student";
+import {
+  getContinueLearning,
+  getUpcomingAssignments,
+  getWeeklyProgress,
+  getStudentStreak,
+  getStudentBadges,
+  getRecommendedPractice,
+} from "@/lib/data/student";
 
 export const metadata: Metadata = { title: "Home" };
 
@@ -35,12 +42,13 @@ export default async function StudentHomePage() {
   const user = await getCurrentUser();
   const profile = user!.profile!;
 
-  const [continueLearning, assignments, progress, streak, badges] = await Promise.all([
+  const [continueLearning, assignments, progress, streak, badges, recommended] = await Promise.all([
     getContinueLearning(profile.id),
     getUpcomingAssignments(profile.id),
     getWeeklyProgress(profile.id),
     getStudentStreak(profile.id),
     getStudentBadges(profile.id),
+    getRecommendedPractice(profile.id),
   ]);
 
   const quickActions = buildQuickActions(continueLearning?.resourceId ?? null);
@@ -94,6 +102,19 @@ export default async function StudentHomePage() {
               )}
             </CardContent>
           </Card>
+
+          {recommended ? (
+            <Card className="rounded-3xl border-2 border-primary/30 bg-primary/5">
+              <CardContent className="p-6">
+                <p className="text-base font-bold text-primary">🎯 Recommended for you</p>
+                <p className="mt-3 font-heading text-lg font-bold">{recommended.title}</p>
+                <p className="mt-1 text-base text-foreground/80">{recommended.reason}</p>
+                <Button asChild className="mt-4 h-11 rounded-2xl px-5 text-base font-bold">
+                  <Link href={`/lesson/${recommended.resourceId}?tab=practice`}>Quick practice →</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          ) : null}
 
           <Card className="rounded-3xl border-2">
             <CardContent className="p-6">

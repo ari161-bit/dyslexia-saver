@@ -69,6 +69,45 @@ export async function simplifyTextAction(text: string): Promise<SimplifyResult> 
   }
 }
 
+export interface KeyIdeasResult {
+  summary?: string;
+  keyPoints?: string[];
+  error?: string;
+}
+
+export async function getKeyIdeasAction(text: string): Promise<KeyIdeasResult> {
+  const user = await getCurrentUser();
+  if (!user?.profile) return { error: "Please sign in." };
+  if (!text.trim()) return { error: "Nothing to summarize yet." };
+
+  try {
+    const ai = getAIService(user.profile.id);
+    const result = await ai.generateRevisionGuide({ text });
+    return { summary: result.data.summary, keyPoints: result.data.keyPoints };
+  } catch {
+    return { error: "Couldn't pull out the key ideas right now. Try again shortly." };
+  }
+}
+
+export interface VocabularyListResult {
+  entries?: { term: string; definition: string; example: string }[];
+  error?: string;
+}
+
+export async function getVocabularyListAction(text: string): Promise<VocabularyListResult> {
+  const user = await getCurrentUser();
+  if (!user?.profile) return { error: "Please sign in." };
+  if (!text.trim()) return { error: "Nothing to look up yet." };
+
+  try {
+    const ai = getAIService(user.profile.id);
+    const result = await ai.generateVocabulary({ text });
+    return { entries: result.data };
+  } catch {
+    return { error: "Couldn't pull out vocabulary right now. Try again shortly." };
+  }
+}
+
 export interface PracticeResult {
   questions?: { question: string; answer: string; sourceQuote: string }[];
   error?: string;

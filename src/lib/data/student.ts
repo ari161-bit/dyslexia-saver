@@ -124,12 +124,66 @@ export interface ProgressBreakdown {
   count: number;
 }
 
+// Reflection/meta events aren't "activities" in the sense this breakdown is
+// showing (how a student spent their time), so they're excluded here even
+// though they're real rows in the same table.
+const NON_ACTIVITY_EVENT_TYPES = new Set(["confidence_reflection"]);
+
 export async function getProgressBreakdown(studentId: string): Promise<ProgressBreakdown[]> {
   const supabase = await createClient();
   const { data } = await supabase.from("bp_progress_events").select("event_type").eq("student_id", studentId);
   const counts = new Map<string, number>();
-  (data ?? []).forEach((e) => counts.set(e.event_type, (counts.get(e.event_type) ?? 0) + 1));
+  (data ?? [])
+    .filter((e) => !NON_ACTIVITY_EVENT_TYPES.has(e.event_type))
+    .forEach((e) => counts.set(e.event_type, (counts.get(e.event_type) ?? 0) + 1));
   return Array.from(counts.entries()).map(([eventType, count]) => ({ eventType, count }));
+}
+
+export interface RecommendedPractice {
+  resourceId: string;
+  title: string;
+  reason: string;
+}
+
+// Real signal, not a guess: a resource is "struggled with" if the student
+// either got a practice question wrong on it, or told BrightPath directly
+// (via the confidence check-in) that they found it difficult or needed
+// help — see the Learning Confidence feature. Whichever resource has the
+// most such signals in the last two weeks gets recommended for another
+// short practice pass.
+export async function getRecommendedPractice(studentId: string): Promise<RecommendedPractice | null> {
+  const supabase = await createClient();
+  const since = new Date();
+  since.setDate(since.getDate() - 14);
+
+  const { data: events } = await supabase
+    .from("bp_progress_events")
+    .select("resource_id, event_type, metadata")
+    .eq("student_id", studentId)
+    .not("resource_id", "is", null)
+    .gte("created_at", since.toISOString());
+
+  const struggleCount = new Map<string, number>();
+  for (const e of events ?? []) {
+    if (!e.resource_id) continue;
+    const metadata = e.metadata as { correct?: boolean; level?: string } | null;
+    const struggled =
+      (e.event_type === "practice_completed" && metadata?.correct === false) ||
+      (e.event_type === "confidence_reflection" && (metadata?.level === "difficult" || metadata?.level === "needed_help"));
+    if (struggled) struggleCount.set(e.resource_id, (struggleCount.get(e.resource_id) ?? 0) + 1);
+  }
+
+  if (struggleCount.size === 0) return null;
+  const [topResourceId] = Array.from(struggleCount.entries()).sort((a, b) => b[1] - a[1])[0];
+
+  const { data: resource } = await supabase.from("bp_resources").select("id, title").eq("id", topResourceId).maybeSingle();
+  if (!resource) return null;
+
+  return {
+    resourceId: resource.id,
+    title: resource.title,
+    reason: "You've found some of this tricky recently — a quick re-practice could help it stick.",
+  };
 }
 
 export interface StudentStreak {
