@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { generateStudentCode } from "@/lib/student-code";
+import { friendlyAuthError } from "@/lib/auth/friendly-error";
 import { ROLE_HOME } from "@/lib/nav-config";
 import type { UserRole } from "@/lib/types/database";
 
@@ -47,7 +48,7 @@ export async function signUpAction(_prev: ActionResult, formData: FormData): Pro
     },
   });
 
-  if (error) return { error: error.message };
+  if (error) return { error: friendlyAuthError(error.message) };
   if (!data.user) return { error: "Something went wrong creating your account." };
 
   if (data.session) {
@@ -113,7 +114,7 @@ export async function updatePasswordAction(
 
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password });
-  if (error) return { error: error.message };
+  if (error) return { error: friendlyAuthError(error.message) };
 
   redirect("/login?reset=success");
 }

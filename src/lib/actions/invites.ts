@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { sendInviteEmail } from "@/lib/email";
 import { generateStudentCode } from "@/lib/student-code";
+import { friendlyAuthError } from "@/lib/auth/friendly-error";
 import { ROLE_HOME } from "@/lib/nav-config";
 import type { UserRole } from "@/lib/types/database";
 
@@ -211,7 +212,7 @@ export async function acceptInviteSignUpAction(_prev: InviteActionResult, formDa
       data: { first_name: firstName, last_name: lastName, role: invite.role },
     },
   });
-  if (signUpError) return { error: signUpError.message };
+  if (signUpError) return { error: friendlyAuthError(signUpError.message) };
   if (!signUpData.user) return { error: "Something went wrong creating your account." };
 
   // No email confirmation required on this project (session came back immediately) —
