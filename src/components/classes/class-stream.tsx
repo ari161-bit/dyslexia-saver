@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
 import { ExternalLink, ImagePlus, Link2, Loader2, MessageCircle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,8 +23,15 @@ export function ClassStream({ classId, posts, canPost }: { classId: string; post
         />
       ) : (
         <div className="space-y-4">
-          {posts.map((post) => (
-            <PostCard key={post.id} classId={classId} post={post} />
+          {posts.map((post, i) => (
+            <motion.div
+              key={post.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: Math.min(i, 5) * 0.05, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <PostCard classId={classId} post={post} />
+            </motion.div>
           ))}
         </div>
       )}

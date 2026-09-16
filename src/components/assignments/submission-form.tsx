@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { saveSubmissionAction } from "@/lib/actions/submissions";
+import { celebrate } from "@/lib/confetti";
 
 export function SubmissionForm({
   assignmentId,
@@ -27,6 +28,7 @@ export function SubmissionForm({
       else {
         toast.success(submit ? "Submitted!" : "Draft saved");
         setCurrentStatus(submit ? "submitted" : "in_progress");
+        if (submit) celebrate();
       }
     });
   }

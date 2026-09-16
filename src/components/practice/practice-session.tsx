@@ -14,6 +14,7 @@ import {
 import { EmptyState } from "@/components/shared/empty-state";
 import { generatePracticeAction } from "@/lib/actions/ai-actions";
 import { recordProgressEventAction } from "@/lib/actions/progress";
+import { celebrate } from "@/lib/confetti";
 import type { PracticeableResource } from "@/lib/data/learning";
 
 interface Question {
@@ -51,6 +52,7 @@ export function PracticeSession({ resources }: { resources: PracticeableResource
     const correct = response.trim().toLowerCase() === current.answer.trim().toLowerCase();
     setChecked(correct ? "correct" : "incorrect");
     if (resource) recordProgressEventAction("practice_completed", resource.id, { correct });
+    if (index + 1 >= questions.length) celebrate();
   }
 
   function next() {
@@ -116,14 +118,24 @@ export function PracticeSession({ resources }: { resources: PracticeableResource
             </div>
           ) : null}
           <div className="flex justify-end gap-2">
-            {checked ? (
-              <Button onClick={next} disabled={index + 1 >= questions.length} variant="outline" className="h-11 rounded-2xl px-5 text-base font-bold">
+            {checked && index + 1 < questions.length ? (
+              <Button onClick={next} variant="outline" className="h-11 rounded-2xl px-5 text-base font-bold">
                 <RefreshCw className="h-5 w-5" /> Next question
               </Button>
-            ) : (
+            ) : !checked ? (
               <Button onClick={check} disabled={!response.trim()} className="h-11 rounded-2xl px-5 text-base font-bold">Check my answer</Button>
-            )}
+            ) : null}
           </div>
+        </div>
+      ) : null}
+
+      {checked && index + 1 >= questions.length ? (
+        <div className="rounded-3xl border-2 border-primary/30 bg-primary/5 p-7 text-center">
+          <p className="font-heading text-xl font-bold">You finished the set! 🎉</p>
+          <p className="mt-1.5 text-sm text-muted-foreground">Nice work getting through all {questions.length} questions.</p>
+          <Button onClick={start} className="mt-4 h-11 rounded-2xl px-5 text-base font-bold">
+            <Sparkles className="h-5 w-5" /> Practice again
+          </Button>
         </div>
       ) : null}
     </div>

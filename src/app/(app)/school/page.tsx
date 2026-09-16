@@ -16,12 +16,12 @@ export default async function SchoolOverviewPage() {
     <div>
       <PageHeader title={school!.schoolName} description="A school-wide view of learning and accessibility." />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard label="Students" value={stats.students} icon={Users} />
-        <StatCard label="Teachers" value={stats.teachers} icon={GraduationCap} />
-        <StatCard label="Classes" value={stats.classes} icon={School} />
-        <StatCard label="Active resources" value={stats.resources} icon={FolderOpen} />
-        <StatCard label="Assignments" value={stats.assignments} icon={ClipboardList} />
-        <StatCard label="Using accessibility settings" value={stats.accessibilityUsage} icon={BookOpenCheck} />
+        <StatCard label="Students" value={stats.students} icon={<Users />} delay={0} />
+        <StatCard label="Teachers" value={stats.teachers} icon={<GraduationCap />} delay={0.05} />
+        <StatCard label="Classes" value={stats.classes} icon={<School />} delay={0.1} />
+        <StatCard label="Active resources" value={stats.resources} icon={<FolderOpen />} delay={0.15} />
+        <StatCard label="Assignments" value={stats.assignments} icon={<ClipboardList />} delay={0.2} />
+        <StatCard label="Using accessibility settings" value={stats.accessibilityUsage} icon={<BookOpenCheck />} delay={0.25} />
       </div>
     </div>
   );

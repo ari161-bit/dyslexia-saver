@@ -35,9 +35,9 @@ export default async function StudentProgressPage() {
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard label="Activities this week" value={weekly.activitiesCompleted} icon={Sparkles} />
-        <StatCard label="Reading sessions" value={weekly.readingSessions} icon={BookOpen} />
-        <StatCard label="Practice completed" value={weekly.practiceCompleted} icon={ClipboardCheck} />
+        <StatCard label="Activities this week" value={weekly.activitiesCompleted} icon={<Sparkles />} delay={0} />
+        <StatCard label="Reading sessions" value={weekly.readingSessions} icon={<BookOpen />} delay={0.05} />
+        <StatCard label="Practice completed" value={weekly.practiceCompleted} icon={<ClipboardCheck />} delay={0.1} />
       </div>
 
       <Card className="rounded-3xl border-2">
