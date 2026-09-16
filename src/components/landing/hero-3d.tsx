@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, PlayCircle } from "lucide-react";
+import { ArrowRight, PlayCircle, Sparkles } from "lucide-react";
 import { WebGLBoundary } from "./webgl-boundary";
 import { HeroFallback } from "./hero-fallback";
 
@@ -127,6 +127,16 @@ export function Hero3D() {
             <PlayCircle className="h-4 w-4" />
             See how it works
           </a>
+        </motion.div>
+
+        <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0.65} className="pointer-events-auto mt-5">
+          <Link
+            href="/demo"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-orange-700 underline decoration-orange-300 decoration-2 underline-offset-4 transition-colors hover:text-orange-800"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Try the live demo — no sign-in needed
+          </Link>
         </motion.div>
 
         <motion.div
