@@ -849,3 +849,26 @@ create policy "bp_post_comments: author deletes own" on bp_post_comments for del
 -- lets a school admin's own newly-created, not-yet-assigned students still
 -- show up as "belonging to my school" before they're placed in any class.
 alter table bp_profiles add column school_id uuid references bp_schools(id) on delete set null;
+
+-- ============================================================================
+-- 0008_fix_signup_trigger.sql — removes a broken, untracked trigger on auth.users
+-- ============================================================================
+-- Diagnostic + fix for "Database error saving new user" on every signup —
+-- see supabase/migrations/0008_fix_signup_trigger.sql for the full
+-- explanation. Brightpath needs no trigger on auth.users; profile creation
+-- is handled entirely in application code.
+
+select tgname as trigger_name, pg_get_triggerdef(oid) as definition
+from pg_trigger
+where tgrelid = 'auth.users'::regclass and not tgisinternal;
+
+do $$
+declare
+  trig record;
+begin
+  for trig in
+    select tgname from pg_trigger where tgrelid = 'auth.users'::regclass and not tgisinternal
+  loop
+    execute format('drop trigger if exists %I on auth.users', trig.tgname);
+  end loop;
+end $$;
