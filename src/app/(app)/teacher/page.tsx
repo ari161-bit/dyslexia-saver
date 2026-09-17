@@ -86,7 +86,7 @@ export default async function TeacherDashboardPage() {
               <LifeBuoy className="h-4 w-4" /> Students Needing Attention
             </p>
             {attention.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Everyone&apos;s been actively engaged recently — nice work.</p>
+              <p className="text-sm text-muted-foreground">Everyone&apos;s been actively engaged recently, nice work.</p>
             ) : (
               <div className="space-y-2">
                 {attention.map((s) => (
@@ -139,10 +139,10 @@ export default async function TeacherDashboardPage() {
         <Card className="border-destructive/30 bg-destructive/5">
           <CardContent>
             <p className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-destructive">
-              <AlertTriangle className="h-4 w-4" /> Needs attention — observed this week
+              <AlertTriangle className="h-4 w-4" /> Needs attention: observed this week
             </p>
             <p className="mb-3 text-xs text-muted-foreground">
-              Based on wrong practice answers and students&apos; own &ldquo;I found this difficult&rdquo; check-ins — not a guess.
+              Based on wrong practice answers and students&apos; own &ldquo;I found this difficult&rdquo; check-ins, not a guess.
             </p>
             <div className="space-y-2">
               {strugglePatterns.map((p) => (

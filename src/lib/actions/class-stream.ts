@@ -36,7 +36,7 @@ export async function createPostAction(_prev: StreamActionResult, formData: Form
     image_url: imageUrl || null,
   });
 
-  if (error) return { error: "Couldn't post that — make sure you teach this class." };
+  if (error) return { error: "Couldn't post that. Make sure you teach this class." };
 
   revalidatePath(`/teacher/classes/${classId}`);
   revalidatePath(`/student/classroom/${classId}`);

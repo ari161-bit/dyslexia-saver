@@ -25,7 +25,7 @@ export function RequestLinkForm() {
         Send request
       </Button>
       {state.error ? <p className="w-full text-sm text-destructive">{state.error}</p> : null}
-      {state.success ? <p className="w-full text-sm text-success">Request sent — a teacher or school admin will confirm it.</p> : null}
+      {state.success ? <p className="w-full text-sm text-success">Request sent, a teacher or school admin will confirm it.</p> : null}
     </form>
   );
 }

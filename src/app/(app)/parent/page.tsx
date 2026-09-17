@@ -43,7 +43,7 @@ export default async function ParentHomePage() {
                 <Card key={child.studentId}>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <p className="font-heading text-lg font-semibold">{child.name} — Learning Overview</p>
+                      <p className="font-heading text-lg font-semibold">{child.name}: Learning Overview</p>
                       <Button variant="outline" size="sm" asChild>
                         <Link href={`/parent/children/${child.studentId}`}>Full overview</Link>
                       </Button>

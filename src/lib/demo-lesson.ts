@@ -1,10 +1,10 @@
-// The flagship demo lesson (Photosynthesis — Grade 7), grounded in the
+// The flagship demo lesson (Photosynthesis, Grade 7), grounded in the
 // exact seeded passage used elsewhere in the app (scripts/seed.ts) and
 // shared between the logged-in lesson pathways screen
 // (src/components/reader/lesson-pathways.tsx) and the public, no-login
 // competition demo (src/app/demo). Kept in one place so the two never
 // drift apart.
-export const DEMO_LESSON_TITLE = "Photosynthesis — Grade 7";
+export const DEMO_LESSON_TITLE = "Photosynthesis: Grade 7";
 export const DEMO_LESSON_SUBJECT = "Science";
 
 export const DEMO_LESSON_TEXT =

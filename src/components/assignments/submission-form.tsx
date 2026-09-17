@@ -46,7 +46,7 @@ export function SubmissionForm({
       />
       {locked ? (
         <p className="flex items-center gap-1.5 text-sm text-success">
-          <CheckCircle2 className="h-4 w-4" /> Submitted — your teacher will review it soon.
+          <CheckCircle2 className="h-4 w-4" /> Submitted, your teacher will review it soon.
         </p>
       ) : (
         <div className="flex gap-2">

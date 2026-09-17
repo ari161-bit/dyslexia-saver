@@ -36,7 +36,7 @@ export function BulkInviteDialog({ classId }: { classId: string }) {
         {state.sent !== undefined ? (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              Sent {state.sent} of {state.total} invites{state.skipped ? ` — ${state.skipped} skipped (already invited or invalid address).` : "."}
+              Sent {state.sent} of {state.total} invites{state.skipped ? `, ${state.skipped} skipped (already invited or invalid address).` : "."}
             </p>
             <Button className="w-full" variant="outline" onClick={() => setOpen(false)}>
               Done

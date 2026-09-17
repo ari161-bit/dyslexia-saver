@@ -65,7 +65,7 @@ export function DemoWalkthrough() {
         </span>
       </header>
 
-      {/* Step indicator — click any step to jump directly, so the presenter stays in control during a live pitch */}
+      {/* Step indicator, click any step to jump directly, so the presenter stays in control during a live pitch */}
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-1 overflow-x-auto px-4 pt-6 sm:px-6">
         {STEPS.map((s, i) => (
           <button
@@ -146,7 +146,7 @@ function OriginalStep() {
       <StepHeading
         eyebrow="Original classroom lesson"
         title="This is the same lesson the teacher already has."
-        description="A real worksheet, unchanged. Brightpath doesn't replace it — it opens more ways into it."
+        description="A real worksheet, unchanged. Brightpath doesn't replace it: it opens more ways into it."
       />
       <div className="rounded-3xl border-2 border-neutral-300 bg-white p-8 shadow-sm" style={{ fontFamily: "Georgia, serif" }}>
         <div className="mb-4 flex items-center justify-between border-b border-dashed border-neutral-300 pb-4">
@@ -178,7 +178,7 @@ function AdaptingStep() {
       <StepHeading
         eyebrow="Adapted with brightpath"
         title="One lesson becomes five ways in."
-        description="Same facts, same learning objective — Brightpath just opens more doors into it."
+        description="Same facts, same learning objective. Brightpath just opens more doors into it."
       />
       <div className="relative flex flex-col items-center gap-6">
         <div className="rounded-2xl border-2 border-neutral-300 bg-white px-6 py-3 text-sm font-semibold text-neutral-700 shadow-sm">
@@ -282,7 +282,7 @@ function ListenStep() {
 
   return (
     <div>
-      <StepHeading eyebrow="Pathway: Listen" title="Listen to the same lesson." description="No new content — just a different way to take it in." />
+      <StepHeading eyebrow="Pathway: Listen" title="Listen to the same lesson." description="No new content, just a different way to take it in." />
       <div className="rounded-2xl border-2 border-border bg-white p-6">
         <div className="flex items-center gap-3">
           <Button size="icon" className="h-12 w-12 rounded-full" onClick={toggle} aria-label={isSpeaking ? "Pause" : "Play"}>
@@ -320,7 +320,7 @@ function ListenStep() {
 function ExplainStep() {
   return (
     <div>
-      <StepHeading eyebrow="Pathway: Explain" title="Same concept, explained simply." description="The academic idea doesn't change — only how it's said." />
+      <StepHeading eyebrow="Pathway: Explain" title="Same concept, explained simply." description="The academic idea doesn't change, only how it's said." />
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border-2 border-border bg-white p-5">
           <p className="mb-2 text-sm font-semibold text-muted-foreground">Original</p>
@@ -371,7 +371,7 @@ function PracticeStep() {
 
   return (
     <div>
-      <StepHeading eyebrow="Pathway: Practice" title="Check understanding, gently." description="Immediate, encouraging feedback — grounded in the lesson text." />
+      <StepHeading eyebrow="Pathway: Practice" title="Check understanding, gently." description="Immediate, encouraging feedback that's grounded in the lesson text." />
       <div className="rounded-2xl border-2 border-border bg-white p-6">
         <p className="text-xs font-bold uppercase tracking-wide text-primary">
           Question {index + 1} of {DEMO_PRACTICE_QUESTIONS.length}
@@ -389,7 +389,7 @@ function PracticeStep() {
           <div className={cn("mt-4 flex items-start gap-3 rounded-xl p-3 text-sm", checked === "correct" ? "bg-success/15 text-success" : "bg-destructive/10 text-destructive")}>
             {checked === "correct" ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" /> : <XCircle className="mt-0.5 h-5 w-5 shrink-0" />}
             <div>
-              <p className="font-semibold">{checked === "correct" ? "Nice work!" : "Close — here's the answer: Water and air."}</p>
+              <p className="font-semibold">{checked === "correct" ? "Nice work!" : "Close, here's the answer: Water and air."}</p>
               <p className="mt-1 opacity-80">From the text: &ldquo;{current.sourceQuote}&rdquo;</p>
             </div>
           </div>
@@ -420,7 +420,7 @@ function ProgressStep() {
       <StepHeading
         eyebrow="Shared progress"
         title="One lesson connects everyone around it."
-        description="Illustrative — showing how the same activity flows to each role, not live data."
+        description="Illustrative: showing how the same activity flows to each role, not live data."
       />
       <div className="grid gap-3 sm:grid-cols-2">
         {roles.map(({ label, icon: Icon, note }, i) => (

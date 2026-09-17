@@ -140,7 +140,7 @@ async function main() {
   const revolutionText = `The Industrial Revolution began in Britain in the late 1700s. New machines changed how goods were made, moving production from homes to factories. Steam power drove textile mills and later, railways. Cities grew quickly as people moved from farms to find factory work. Working conditions were often difficult, with long hours and little safety regulation. Over time, new laws improved conditions and gave workers more rights.`;
 
   const resourceSeeds = [
-    { title: "Photosynthesis — Grade 7", subject: "Science", text: photosynthesisText, owner: teachers[0], classIndex: 0 },
+    { title: "Photosynthesis: Grade 7", subject: "Science", text: photosynthesisText, owner: teachers[0], classIndex: 0 },
     { title: "The Industrial Revolution", subject: "History", text: revolutionText, owner: teachers[2], classIndex: 2 },
   ];
 

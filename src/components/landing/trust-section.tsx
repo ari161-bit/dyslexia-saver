@@ -33,7 +33,7 @@ export function TrustSection() {
 
       <Reveal delay={0.3} className="mx-auto mt-16 max-w-xl text-center">
         <p className="text-lg text-stone-500">
-          The goal is independence — <span className="text-stone-800">not an AI shortcut around the learning process.</span>
+          The goal is independence, <span className="text-stone-800">not an AI shortcut around the learning process.</span>
         </p>
       </Reveal>
     </section>

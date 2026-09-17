@@ -10,7 +10,7 @@ export default function StudentUploadPage() {
       <PageHeader
         size="lg"
         title="Upload a Page 📤"
-        description="Add a worksheet, photo, or document — we'll turn it into something easier to read."
+        description="Add a worksheet, photo, or document. We'll turn it into something easier to read."
       />
       <UploadDropzone destination="student" />
     </div>

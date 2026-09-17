@@ -47,7 +47,7 @@ export function CreateStudentDialog({ classes }: { classes: ClassOption[] }) {
 
         {state.success ? (
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">Account created. Share these with the student — the password won&apos;t be shown again.</p>
+            <p className="text-sm text-muted-foreground">Account created. Share these with the student. The password won&apos;t be shown again.</p>
             <div className="space-y-1 rounded-xl border border-border/70 bg-muted/40 p-3 font-mono text-sm">
               <p>Email: {state.email}</p>
               <p>Password: {state.password}</p>

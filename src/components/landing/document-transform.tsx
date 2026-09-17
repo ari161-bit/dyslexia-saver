@@ -19,7 +19,7 @@ const STATES = [
   {
     key: "LISTEN",
     icon: Ear,
-    body: "▶ Now playing — \"Plants make their own food using sunlight, water, and air…\"",
+    body: "▶ Now playing: \"Plants make their own food using sunlight, water, and air…\"",
   },
   {
     key: "FOCUS",

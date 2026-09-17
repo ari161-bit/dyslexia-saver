@@ -49,7 +49,7 @@ export function InviteStudentDialog({ classId }: { classId: string }) {
               </button>
             </div>
             <p className="text-xs text-muted-foreground">
-              If email delivery isn&apos;t configured yet, share this link with them directly — or just give
+              If email delivery isn&apos;t configured yet, share this link with them directly, or just give
               them the join code instead.
             </p>
             <Button className="w-full" variant="outline" onClick={() => setOpen(false)}>

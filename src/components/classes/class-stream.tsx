@@ -58,7 +58,7 @@ function PostComposer({ classId }: { classId: string }) {
       <input type="hidden" name="classId" value={classId} />
       <Textarea name="body" rows={3} placeholder="Share something with the class…" required className="resize-none" />
       {showLink ? <Input name="linkUrl" type="url" placeholder="https://…" /> : null}
-      {showImage ? <Input name="imageUrl" type="url" placeholder="Image URL — https://…" /> : null}
+      {showImage ? <Input name="imageUrl" type="url" placeholder="Image URL: https://…" /> : null}
       <div className="flex items-center justify-between">
         <div className="flex gap-1.5">
           <Button type="button" variant="ghost" size="sm" onClick={() => setShowLink((v) => !v)}>

@@ -66,7 +66,7 @@ export async function getStudentsNeedingAttention(teacherId: string): Promise<St
       studentId: member.student_id,
       name: profile ? `${profile.first_name} ${profile.last_name}` : "Student",
       className: classById.get(member.class_id) ?? "Class",
-      reason: "May benefit from additional support — no recent activity",
+      reason: "May benefit from additional support: no recent activity",
     });
   }
 

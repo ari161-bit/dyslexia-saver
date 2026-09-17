@@ -12,7 +12,7 @@ export default async function SchoolLayout({ children }: { children: React.React
       <EmptyState
         icon={Clock}
         title="Verification pending"
-        description={`${school?.schoolName ?? "Your school"} is still being verified. This usually takes a short while — check back soon.`}
+        description={`${school?.schoolName ?? "Your school"} is still being verified. This usually takes a short while, check back soon.`}
       />
     );
   }

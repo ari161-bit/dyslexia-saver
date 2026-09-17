@@ -99,7 +99,7 @@ export class MockAIProvider implements AIService {
     const gist = sentences.join(" ");
     const explanation = question
       ? `Looking at the text, here's what's relevant to "${question}": ${gist || "the source doesn't say enough to answer that yet."}`
-      : `In simpler terms: ${gist || "this section is short — try selecting a longer passage to explain."}`;
+      : `In simpler terms: ${gist || "this section is short, try selecting a longer passage to explain."}`;
     return { data: explanation, groundedIn: text, provider: this.name };
   }
 
@@ -110,7 +110,7 @@ export class MockAIProvider implements AIService {
       const example = sentences.find((s) => s.toLowerCase().includes(word)) ?? sentences[0] ?? "";
       return {
         term: titleCase(word),
-        definition: `A key term from this material — ask your AI tutor or teacher to confirm the exact meaning of "${word}" in this context.`,
+        definition: `A key term from this material. Ask your AI tutor or teacher to confirm the exact meaning of "${word}" in this context.`,
         example,
       };
     });

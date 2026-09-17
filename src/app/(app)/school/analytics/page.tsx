@@ -36,7 +36,7 @@ export default async function SchoolAnalyticsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Analytics"
-        description="Aggregated, school-wide — never drilled down to a single student's private data."
+        description="Aggregated, school-wide, never drilled down to a single student's private data."
         action={
           <ExportAnalyticsButton
             schoolName={school!.schoolName}

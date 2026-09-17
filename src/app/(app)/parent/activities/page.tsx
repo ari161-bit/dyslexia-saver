@@ -23,7 +23,7 @@ export default async function ParentActivitiesPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="At-home Activities" description="Short, practical ways to support learning — no prep required." />
+      <PageHeader title="At-home Activities" description="Short, practical ways to support learning, no prep required." />
       {await Promise.all(
         children.map(async (child) => {
           const overview = await getChildOverview(child.studentId);

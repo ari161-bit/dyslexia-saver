@@ -31,7 +31,7 @@ export default async function StudentProgressPage() {
       <PageHeader
         size="lg"
         title="Your Progress 🌟"
-        description="A picture of the work you've been putting in — not a score, just how much you've practiced."
+        description="A picture of the work you've been putting in, not a score, just how much you've practiced."
       />
 
       <div className="grid gap-4 sm:grid-cols-3">

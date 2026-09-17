@@ -54,8 +54,8 @@ interface QAItem {
 }
 
 // A hand-written simplification and a fixed question set for the flagship
-// demo lesson (Photosynthesis — Grade 7), grounded in the exact seeded
-// passage — so the pitch's core moment never depends on a live AI call
+// demo lesson (Photosynthesis, Grade 7), grounded in the exact seeded
+// passage, so the pitch's core moment never depends on a live AI call
 // working mid-demo. Everything still runs for real on any other resource
 // via the live AI actions below.
 const PHOTOSYNTHESIS_SIMPLIFIED = [
@@ -76,7 +76,7 @@ const PHOTOSYNTHESIS_KEY_IDEAS = {
     "Chlorophyll captures light energy from the sun.",
     "The plant combines that energy with water and carbon dioxide.",
     "The process makes glucose (the plant's food) and oxygen.",
-    "Oxygen is released into the air — other living things need it to breathe.",
+    "Oxygen is released into the air. Other living things need it to breathe.",
   ],
 };
 
@@ -161,7 +161,7 @@ export function LessonPathways({
         <div>
           <h1 className="font-heading text-2xl font-bold sm:text-3xl">{resource.title}</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            One lesson, six ways in — read it clearer, listen, simplify, get the key ideas, check vocabulary, or practise.
+            One lesson, six ways in: read it clearer, listen, simplify, get the key ideas, check vocabulary, or practise.
           </p>
         </div>
         <Link href={`/read/${resource.id}`} className="text-xs font-medium text-primary hover:underline">
@@ -357,7 +357,7 @@ function SimplifyTab({ paragraphs, fullText, isDemo }: { paragraphs: string[]; f
             <Wand2 className="h-8 w-8 text-primary" />
             <p className="font-heading text-lg font-semibold">Rewrite this passage for easier reading</p>
             <p className="max-w-sm text-sm text-muted-foreground">
-              Same facts, shorter sentences, simpler words — generated live from the lesson text.
+              Same facts, shorter sentences, simpler words. Generated live from the lesson text.
             </p>
             <Button onClick={runAI} disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
@@ -412,7 +412,7 @@ function ReadingEaseBadge({ score, grade, highlight }: { score: number; grade: s
         "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold",
         highlight ? "border-success/40 bg-success/15 text-success" : "border-border bg-muted text-muted-foreground",
       )}
-      title="Flesch Reading Ease — higher is easier to read"
+      title="Flesch Reading Ease: higher is easier to read"
     >
       {score} · {grade}
     </span>
@@ -604,7 +604,7 @@ function PracticeTab({ resourceId, fullText, isDemo }: { resourceId: string; ful
         <div className={cn("flex items-start gap-3 rounded-xl p-3 text-sm", checked === "correct" ? "bg-success/15 text-success" : "bg-destructive/10 text-destructive")}>
           {checked === "correct" ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" /> : <XCircle className="mt-0.5 h-5 w-5 shrink-0" />}
           <div>
-            <p className="font-semibold">{checked === "correct" ? "Nice work! 🎉" : "Not quite — check the passage again."}</p>
+            <p className="font-semibold">{checked === "correct" ? "Nice work! 🎉" : "Not quite, check the passage again."}</p>
             <p className="mt-1 opacity-80">From the text: &ldquo;{current.sourceQuote}&rdquo;</p>
           </div>
         </div>
@@ -630,7 +630,7 @@ const CONFIDENCE_LEVELS = [
   { level: "difficult", label: "I found this difficult", icon: Frown },
 ] as const;
 
-// Not another grade — a direct signal of how the lesson FELT, separate from
+// Not another grade, a direct signal of how the lesson FELT, separate from
 // whether the answers were right. A student can get a question wrong but
 // still say "I understood this" (a slip, not a comprehension gap), or get
 // it right while saying "I needed help" (guessed, or it took real effort).
@@ -647,7 +647,7 @@ function ConfidenceCheckIn({ resourceId }: { resourceId: string }) {
   if (picked) {
     return (
       <div className="rounded-2xl border border-border/70 bg-muted/40 p-4 text-center text-sm text-muted-foreground">
-        Thanks — that helps your teacher understand how this lesson felt, not just the score.
+        Thanks, that helps your teacher understand how this lesson felt, not just the score.
       </div>
     );
   }

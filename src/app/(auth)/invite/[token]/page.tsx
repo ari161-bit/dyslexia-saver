@@ -33,7 +33,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
       invite.status === "accepted"
         ? "This invite has already been accepted."
         : invite.status === "expired"
-          ? "This invite has expired — ask whoever sent it to send a new one."
+          ? "This invite has expired, ask whoever sent it to send a new one."
           : "This invite was revoked.";
     return (
       <div className="space-y-4 text-center">
@@ -55,7 +55,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
       <div className="space-y-1.5 text-center">
         <h1 className="font-heading text-2xl font-semibold">You&apos;re invited</h1>
         <p className="text-sm text-muted-foreground">
-          Join <strong className="text-foreground">{invite.class_name ? `${invite.school_name} — ${invite.class_name}` : invite.school_name}</strong> as{" "}
+          Join <strong className="text-foreground">{invite.class_name ? `${invite.school_name}, ${invite.class_name}` : invite.school_name}</strong> as{" "}
           {ROLE_LABEL[invite.role] ?? invite.role} on Brightpath.
         </p>
       </div>

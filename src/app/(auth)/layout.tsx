@@ -22,7 +22,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             Learning should adapt to the learner.
           </p>
           <p className="max-w-md text-accent-foreground/80">
-            One lesson, understood in whatever way makes it click — reading, listening,
+            One lesson, understood in whatever way makes it click: reading, listening,
             simplified, or broken down step by step.
           </p>
           <div className="mt-4 flex -space-x-3">

@@ -26,7 +26,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Brightpath — Learning that adapts to the learner",
+    default: "Brightpath: Learning that adapts to the learner",
     template: "%s · Brightpath",
   },
   description:

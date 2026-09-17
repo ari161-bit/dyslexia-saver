@@ -133,14 +133,14 @@ export async function getChildrenResources(parentId: string): Promise<ParentReso
 const ACTIVITY_SUGGESTIONS: Record<string, string[]> = {
   reading_session: [
     "Try reading one short paragraph together and asking your child to explain the main idea in their own words.",
-    "Take turns reading a paragraph aloud — alternating reduces pressure and keeps it collaborative.",
+    "Take turns reading a paragraph aloud. Alternating reduces pressure and keeps it collaborative.",
   ],
   practice_completed: [
-    "Ask your child to teach you one thing they practiced today — explaining it back is a great memory check.",
+    "Ask your child to teach you one thing they practiced today. Explaining it back is a great memory check.",
   ],
   default: [
     "Ask your child to show you one thing they worked on today, even for just five minutes.",
-    "Celebrate effort, not just results — noticing the attempt matters more than getting it perfect.",
+    "Celebrate effort, not just results. Noticing the attempt matters more than getting it perfect.",
   ],
 };
 

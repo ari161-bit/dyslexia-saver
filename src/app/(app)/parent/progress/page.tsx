@@ -17,7 +17,7 @@ export default async function ParentProgressPage() {
   if (children.length === 0) {
     return (
       <div>
-        <PageHeader title="Progress" description="A picture of your child's practice — never a score." />
+        <PageHeader title="Progress" description="A picture of your child's practice, never a score." />
         <EmptyState icon={BarChart3} title="Link a child first" description="Once linked, progress trends will show up here." />
       </div>
     );
@@ -25,7 +25,7 @@ export default async function ParentProgressPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Progress" description="A picture of practice and engagement — never a score." />
+      <PageHeader title="Progress" description="A picture of practice and engagement, never a score." />
       {await Promise.all(
         children.map(async (child) => {
           const [weekly, timeline] = await Promise.all([

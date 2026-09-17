@@ -72,7 +72,7 @@ export async function createStudentAccountAction(_prev: CreateStudentResult, for
     .single();
   if (profileError || !profile) {
     await admin.auth.admin.deleteUser(created.user.id);
-    return { error: "Account created but setup failed — nothing was saved. Try again." };
+    return { error: "Account created but setup failed. Nothing was saved. Try again." };
   }
 
   if (classId) {

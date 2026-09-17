@@ -112,7 +112,7 @@ export function PracticeSession({ resources }: { resources: PracticeableResource
             >
               {checked === "correct" ? <CheckCircle2 className="mt-0.5 h-6 w-6 shrink-0" /> : <XCircle className="mt-0.5 h-6 w-6 shrink-0" />}
               <div>
-                <p className="font-bold">{checked === "correct" ? "Nice work! 🎉" : `Not quite — the answer was "${current.answer}"`}</p>
+                <p className="font-bold">{checked === "correct" ? "Nice work! 🎉" : `Not quite, the answer was "${current.answer}"`}</p>
                 <p className="mt-1.5 text-sm opacity-80">From what you read: &ldquo;{current.sourceQuote}&rdquo;</p>
               </div>
             </div>

@@ -17,7 +17,7 @@ import { createAssignmentAction, type AssignmentActionResult } from "@/lib/actio
 
 type Worksheet = NonNullable<WorksheetResult["worksheet"]>;
 
-// Shared by both the teacher and student worksheet pages — the "save as
+// Shared by both the teacher and student worksheet pages, the "save as
 // assignment" section only renders when `classes` is passed (teacher-only;
 // students don't have a class to assign to, they just use the worksheet
 // for their own practice).
@@ -50,7 +50,7 @@ export function WorksheetGenerator({ classes }: { classes?: { id: string; name: 
           value={context}
           onChange={(e) => setContext(e.target.value)}
           rows={7}
-          placeholder="Paste a passage, your notes, a textbook excerpt — anything with real content. The worksheet will only use what's here, nothing made up."
+          placeholder="Paste a passage, your notes, or a textbook excerpt (anything with real content). The worksheet will only use what's here, nothing made up."
           className="rounded-2xl border-2 text-base"
         />
         <div className="flex flex-wrap items-center gap-3">

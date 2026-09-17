@@ -12,7 +12,7 @@ import { VisionSection } from "@/components/landing/vision-section";
 import { FinalCTA } from "@/components/landing/final-cta";
 
 export const metadata: Metadata = {
-  title: "Brightpath — Learning that adapts to the learner",
+  title: "Brightpath: Learning that adapts to the learner",
   description: "One connected experience for students, teachers, parents and schools.",
 };
 

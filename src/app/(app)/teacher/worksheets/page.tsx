@@ -14,7 +14,7 @@ export default async function TeacherWorksheetsPage() {
     <div>
       <PageHeader
         title="Worksheet Generator"
-        description="Paste in a passage, notes, or a topic outline — get back a worksheet grounded in exactly that material, ready to assign."
+        description="Paste in a passage, notes, or a topic outline. Get back a worksheet grounded in exactly that material, ready to assign."
       />
       <WorksheetGenerator classes={classes} />
     </div>

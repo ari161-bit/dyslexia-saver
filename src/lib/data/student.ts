@@ -182,7 +182,7 @@ export async function getRecommendedPractice(studentId: string): Promise<Recomme
   return {
     resourceId: resource.id,
     title: resource.title,
-    reason: "You've found some of this tricky recently — a quick re-practice could help it stick.",
+    reason: "You've found some of this tricky recently. A quick re-practice could help it stick.",
   };
 }
 

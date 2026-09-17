@@ -35,7 +35,7 @@ export function ExportAnalyticsButton({
   function handleExport() {
     const generatedAt = new Date().toISOString();
     const sections = [
-      [`Brightpath analytics export — ${schoolName}`],
+      [`Brightpath analytics export: ${schoolName}`],
       [`Generated`, generatedAt],
       [],
       ["Overview"],

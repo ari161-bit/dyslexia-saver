@@ -17,7 +17,7 @@ export default async function PracticePage() {
       <PageHeader
         size="lg"
         title="Practice Time 🎯"
-        description="Questions made from your own material — nothing made up, always based on what you've actually read."
+        description="Questions made from your own material, nothing made up, always based on what you've actually read."
       />
       <Tabs defaultValue="practice">
         <TabsList>

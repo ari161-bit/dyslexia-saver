@@ -25,7 +25,7 @@ export default async function ChildOverviewPage({ params }: { params: Promise<{ 
 
   return (
     <div className="space-y-6">
-      <PageHeader title={`${overview.name} — Learning Overview`} />
+      <PageHeader title={`${overview.name}: Learning Overview`} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
@@ -39,7 +39,7 @@ export default async function ChildOverviewPage({ params }: { params: Promise<{ 
               <div className="space-y-2">
                 {overview.recentActivity.map((a, i) => (
                   <div key={i} className="flex items-center justify-between rounded-lg bg-secondary/50 px-3 py-2 text-sm">
-                    <span>{EVENT_LABEL[a.eventType] ?? a.eventType}{a.resourceTitle ? ` — ${a.resourceTitle}` : ""}</span>
+                    <span>{EVENT_LABEL[a.eventType] ?? a.eventType}{a.resourceTitle ? `, ${a.resourceTitle}` : ""}</span>
                     <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(a.createdAt), { addSuffix: true })}</span>
                   </div>
                 ))}

@@ -176,7 +176,7 @@ export default async function StudentHomePage() {
               <p className="text-base font-bold text-primary">🌟 This week</p>
               <p className="mt-3 text-base leading-relaxed text-foreground/90">
                 You&apos;ve done <span className="font-heading text-2xl font-extrabold text-success">{progress.activitiesCompleted}</span>{" "}
-                {progress.activitiesCompleted === 1 ? "activity" : "activities"} this week. That&apos;s awesome — keep it up, at your own pace!
+                {progress.activitiesCompleted === 1 ? "activity" : "activities"} this week. That&apos;s awesome, keep it up, at your own pace!
               </p>
               <Button variant="outline" className="mt-5 h-12 w-full rounded-2xl text-base font-bold" asChild>
                 <Link href="/student/progress">See my progress</Link>

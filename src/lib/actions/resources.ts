@@ -56,7 +56,7 @@ export async function uploadResourceAction(_prev: UploadResult, formData: FormDa
       .from("bp_resources")
       .update({
         title: title || extracted.title,
-        extracted_text: extracted.rawText || "We couldn't read any text from this file — it may be a scanned image or photo, which isn't supported yet. Try a text-based PDF, Word document, or plain text file, or paste the content directly.",
+        extracted_text: extracted.rawText || "We couldn't read any text from this file. It may be a scanned image or photo, which isn't supported yet. Try a text-based PDF, Word document, or plain text file, or paste the content directly.",
         extracted_structure: extracted,
         status: "ready",
       })

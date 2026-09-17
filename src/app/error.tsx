@@ -16,7 +16,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
       </span>
       <h1 className="font-heading text-2xl font-semibold">Something went wrong</h1>
       <p className="max-w-sm text-muted-foreground">
-        This wasn&apos;t your fault — try again, and if it keeps happening let us know.
+        This wasn&apos;t your fault, try again, and if it keeps happening let us know.
       </p>
       <Button onClick={reset}>Try again</Button>
     </div>

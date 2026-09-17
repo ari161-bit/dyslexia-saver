@@ -16,7 +16,7 @@ import {
 import type { AdaptationType } from "@/lib/types/database";
 
 const TYPE_COPY: Record<AdaptationType, { title: string; description: string }> = {
-  accessible: { title: "Accessible Reading", description: "Presentation adjusted for easier reading — meaning unchanged." },
+  accessible: { title: "Accessible Reading", description: "Presentation adjusted for easier reading. Meaning unchanged." },
   explain: { title: "Explain", description: "A simpler explanation of the same material." },
   vocabulary: { title: "Vocabulary", description: "Key terms identified from the source text." },
   breakdown: { title: "Break It Down", description: "Complex content divided into manageable steps." },

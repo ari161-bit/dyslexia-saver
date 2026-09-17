@@ -57,7 +57,7 @@ export async function signUpAction(_prev: ActionResult, formData: FormData): Pro
     } catch (err) {
       console.error("provisionProfile failed during signup", err);
       return {
-        error: "Your account was created, but we couldn't finish setting it up. Please try logging in — if that doesn't work, contact support.",
+        error: "Your account was created, but we couldn't finish setting it up. Please try logging in, and if that doesn't work, contact support.",
       };
     }
     redirect(ROLE_HOME[role]);

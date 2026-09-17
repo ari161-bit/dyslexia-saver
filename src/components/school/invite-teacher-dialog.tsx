@@ -14,7 +14,7 @@ export function InviteTeacherDialog() {
   const [state, formAction, pending] = useActionState<InviteActionResult, FormData>(inviteTeacherAction, {});
 
   useEffect(() => {
-    if (state.success) toast.success("Invite sent — they'll join already approved once they accept it.");
+    if (state.success) toast.success("Invite sent, they'll join already approved once they accept it.");
   }, [state.success]);
 
   return (
@@ -33,7 +33,7 @@ export function InviteTeacherDialog() {
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
               Invite created for this email. Since they&apos;re invited directly, they&apos;ll be approved
-              automatically the moment they accept — no separate approval step needed.
+              automatically the moment they accept, no separate approval step needed.
             </p>
             <div className="flex items-center gap-2 rounded-lg border border-border bg-muted px-3 py-2 text-xs">
               <Mail className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />

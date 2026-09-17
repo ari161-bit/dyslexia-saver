@@ -135,7 +135,7 @@ export function Hero3D() {
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-orange-700 underline decoration-orange-300 decoration-2 underline-offset-4 transition-colors hover:text-orange-800"
           >
             <Sparkles className="h-3.5 w-3.5" />
-            Try the live demo — no sign-in needed
+            Try the live demo (no sign-in needed)
           </Link>
         </motion.div>
 

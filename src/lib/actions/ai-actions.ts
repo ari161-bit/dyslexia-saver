@@ -140,7 +140,7 @@ export async function generateWorksheetAction(sourceText: string, questionCount 
   const user = await getCurrentUser();
   if (!user?.profile) return { error: "Please sign in." };
   if (!sourceText.trim() || sourceText.trim().split(/\s+/).length < 15) {
-    return { error: "Paste a bit more material — at least a few sentences — so the worksheet has something to work from." };
+    return { error: "Paste a bit more material (at least a few sentences) so the worksheet has something to work from." };
   }
 
   try {

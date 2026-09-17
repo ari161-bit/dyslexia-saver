@@ -43,7 +43,7 @@ export default async function TeacherStudentDetailPage({ params }: { params: Pro
           <p className="mb-3 text-sm font-semibold text-muted-foreground">Recent activity</p>
           {student.recentActivity.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No recent activity — may benefit from a check-in or additional support.
+              No recent activity, may benefit from a check-in or additional support.
             </p>
           ) : (
             <div className="space-y-2">

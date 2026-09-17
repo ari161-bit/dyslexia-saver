@@ -21,7 +21,7 @@ export async function sendInviteEmail(opts: {
 
   const resend = new Resend(apiKey);
   const roleLabel = opts.role === "school_admin" ? "an admin" : opts.role === "teacher" ? "a teacher" : "a student";
-  const context = opts.className ? `${opts.schoolName} — ${opts.className}` : opts.schoolName;
+  const context = opts.className ? `${opts.schoolName}: ${opts.className}` : opts.schoolName;
 
   const { error } = await resend.emails.send({
     from: process.env.EMAIL_FROM ?? "Brightpath <onboarding@resend.dev>",

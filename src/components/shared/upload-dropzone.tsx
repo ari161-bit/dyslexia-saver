@@ -86,7 +86,7 @@ export function UploadDropzone({ destination }: { destination: "student" | "teac
           <>
             <UploadCloud className="h-8 w-8 text-muted-foreground" />
             <p className="font-medium">Drop a file here, or click to browse</p>
-            <p className="text-xs text-muted-foreground">PDF, Word, image, or text — up to 25MB</p>
+            <p className="text-xs text-muted-foreground">PDF, Word, image, or text (up to 25MB)</p>
           </>
         )}
       </div>

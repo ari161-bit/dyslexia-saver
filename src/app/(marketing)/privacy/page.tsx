@@ -12,7 +12,7 @@ export default function PrivacyPolicyPage() {
         <p>
           Brightpath (&quot;we&quot;, &quot;our&quot;) provides an accessible learning support
           platform for students, teachers, parents, and schools. This policy explains what
-          information we collect, how we use it, and the choices you have — with particular
+          information we collect, how we use it, and the choices you have, with particular
           care given that many of our users are minors.
         </p>
 
@@ -20,7 +20,7 @@ export default function PrivacyPolicyPage() {
         <ul>
           <li><strong>Account information:</strong> name, email address, and role (student, parent, teacher, or school admin).</li>
           <li><strong>Learning content:</strong> documents you upload, extracted text, AI-generated adaptations, notes, and reading preferences.</li>
-          <li><strong>Activity data:</strong> assignments, submissions, and practice/reading engagement — used to show progress, never to diagnose or label a student.</li>
+          <li><strong>Activity data:</strong> assignments, submissions, and practice/reading engagement, used to show progress, never to diagnose or label a student.</li>
           <li><strong>Relationship data:</strong> links between parents and students, and between teachers, classes, and schools, used only to control who can see what.</li>
           <li><strong>Messages:</strong> content sent between parents and teachers within the platform.</li>
         </ul>
@@ -28,7 +28,7 @@ export default function PrivacyPolicyPage() {
         <h2>How we use information</h2>
         <ul>
           <li>To operate core features: adapting materials, tracking assignments, generating practice questions, and showing progress.</li>
-          <li>To enforce access control — for example, a parent can only see their own linked child&apos;s data, and a teacher can only see their own students.</li>
+          <li>To enforce access control, for example, a parent can only see their own linked child&apos;s data, and a teacher can only see their own students.</li>
           <li>To communicate account and safety-related notices.</li>
         </ul>
         <p>We do not sell personal information, and we do not use student data for advertising.</p>
@@ -37,7 +37,7 @@ export default function PrivacyPolicyPage() {
         <p>
           Brightpath is designed to be used within a school or family context, not signed up
           for independently by young children. Student accounts are connected to a teacher
-          (via a school) and, optionally, a parent — both relationships require explicit
+          (via a school) and, optionally, a parent, both relationships require explicit
           confirmation before either party can view the student&apos;s data. Parents may
           contact us at any time to review or request deletion of their child&apos;s
           information.
@@ -68,7 +68,7 @@ export default function PrivacyPolicyPage() {
         <h2>Security</h2>
         <p>
           Access to data is enforced at the database level (row-level security), so each
-          account can only ever query the rows it is authorized to see — not just restricted
+          account can only ever query the rows it is authorized to see, not just restricted
           by the app&apos;s interface.
         </p>
 
