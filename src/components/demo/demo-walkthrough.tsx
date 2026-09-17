@@ -55,75 +55,90 @@ export function DemoWalkthrough() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fdfaf6]">
-      <header className="flex items-center justify-between border-b border-border/70 bg-white/80 px-4 py-3 backdrop-blur sm:px-6">
-        <Link href="/" className="flex items-center gap-2 text-sm font-semibold text-foreground">
-          <Home className="h-4 w-4" /> Brightpath
-        </Link>
-        <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-orange-700">
-          Competition Demo
-        </span>
-      </header>
+    <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(249,115,22,0.08),transparent)] bg-stone-100 p-3 sm:p-8">
+      {/* A browser-chrome frame around the whole walkthrough, so this reads
+          as a real running product on a screen, not a set of slides. */}
+      <div className="flex h-[calc(100vh-1.5rem)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl sm:h-[85vh]">
+        <div className="flex items-center gap-3 border-b border-stone-200 bg-stone-50 px-4 py-2.5">
+          <div className="flex gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-stone-300" />
+            <span className="h-2.5 w-2.5 rounded-full bg-stone-300" />
+            <span className="h-2.5 w-2.5 rounded-full bg-stone-300" />
+          </div>
+          <div className="flex flex-1 justify-center">
+            <span className="rounded-full bg-white px-4 py-1 text-xs text-stone-400">brightpath.app/demo</span>
+          </div>
+        </div>
 
-      {/* Step indicator, click any step to jump directly, so the presenter stays in control during a live pitch */}
-      <div className="mx-auto flex max-w-3xl items-center justify-between gap-1 overflow-x-auto px-4 pt-6 sm:px-6">
-        {STEPS.map((s, i) => (
-          <button
-            key={s}
-            onClick={() => goTo(i)}
-            className={cn(
-              "flex flex-1 flex-col items-center gap-1.5 whitespace-nowrap px-1 pb-3 text-xs font-semibold transition-colors",
-              i === stepIndex ? "text-primary" : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <span
+        <header className="flex items-center justify-between border-b border-border/70 bg-white/80 px-4 py-3 backdrop-blur sm:px-6">
+          <Link href="/" className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <Home className="h-4 w-4" /> Brightpath
+          </Link>
+          <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-orange-700">
+            Competition Demo
+          </span>
+        </header>
+
+        {/* Step indicator, click any step to jump directly, so the presenter stays in control during a live pitch */}
+        <div className="flex items-center justify-between gap-1 overflow-x-auto px-4 pt-5 sm:px-6">
+          {STEPS.map((s, i) => (
+            <button
+              key={s}
+              onClick={() => goTo(i)}
               className={cn(
-                "flex h-2 w-2 rounded-full transition-all",
-                i === stepIndex ? "w-6 bg-primary" : i < stepIndex ? "bg-primary/40" : "bg-border",
+                "flex flex-1 flex-col items-center gap-1.5 whitespace-nowrap px-1 pb-3 text-xs font-semibold transition-colors",
+                i === stepIndex ? "text-primary" : "text-muted-foreground hover:text-foreground",
               )}
-            />
-            {s}
-          </button>
-        ))}
-      </div>
+            >
+              <span
+                className={cn(
+                  "flex h-2 w-2 rounded-full transition-all",
+                  i === stepIndex ? "w-6 bg-primary" : i < stepIndex ? "bg-primary/40" : "bg-border",
+                )}
+              />
+              {s}
+            </button>
+          ))}
+        </div>
 
-      <main className="mx-auto max-w-3xl px-4 pb-28 sm:px-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          >
-            {step === "Original" ? <OriginalStep /> : null}
-            {step === "Adapting" ? <AdaptingStep /> : null}
-            {step === "Read" ? <ReadStep onTryFocus={() => setFocusMode(true)} /> : null}
-            {step === "Listen" ? <ListenStep /> : null}
-            {step === "Explain" ? <ExplainStep /> : null}
-            {step === "Practice" ? <PracticeStep /> : null}
-            {step === "Progress" ? <ProgressStep /> : null}
-          </motion.div>
-        </AnimatePresence>
-      </main>
+        <main className="flex-1 overflow-y-auto px-4 pb-6 sm:px-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {step === "Original" ? <OriginalStep /> : null}
+              {step === "Adapting" ? <AdaptingStep /> : null}
+              {step === "Read" ? <ReadStep onTryFocus={() => setFocusMode(true)} /> : null}
+              {step === "Listen" ? <ListenStep /> : null}
+              {step === "Explain" ? <ExplainStep /> : null}
+              {step === "Practice" ? <PracticeStep /> : null}
+              {step === "Progress" ? <ProgressStep /> : null}
+            </motion.div>
+          </AnimatePresence>
+        </main>
 
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border/70 bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
-        <div className="mx-auto flex max-w-3xl items-center justify-between">
-          <Button variant="ghost" onClick={() => goTo(stepIndex - 1)} disabled={stepIndex === 0}>
-            <ArrowLeft className="h-4 w-4" /> Back
-          </Button>
-          <p className="text-xs text-muted-foreground">
-            Step {stepIndex + 1} of {STEPS.length}
-          </p>
-          {stepIndex < STEPS.length - 1 ? (
-            <Button onClick={() => goTo(stepIndex + 1)}>
-              Next <ArrowRight className="h-4 w-4" />
+        <div className="border-t border-border/70 bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
+          <div className="flex items-center justify-between">
+            <Button variant="ghost" onClick={() => goTo(stepIndex - 1)} disabled={stepIndex === 0}>
+              <ArrowLeft className="h-4 w-4" /> Back
             </Button>
-          ) : (
-            <Button asChild>
-              <Link href="/">Exit demo</Link>
-            </Button>
-          )}
+            <p className="text-xs text-muted-foreground">
+              Step {stepIndex + 1} of {STEPS.length}
+            </p>
+            {stepIndex < STEPS.length - 1 ? (
+              <Button onClick={() => goTo(stepIndex + 1)}>
+                Next <ArrowRight className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button asChild>
+                <Link href="/">Exit demo</Link>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -241,7 +256,7 @@ function ReadStep({ onTryFocus }: { onTryFocus: () => void }) {
           </p>
         ))}
       </motion.div>
-      <button onClick={onTryFocus} className="mt-4 flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+      <button onClick={onTryFocus} className="mb-2 mt-4 flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
         <Eye className="h-3.5 w-3.5" /> Try Focus mode →
       </button>
     </div>
