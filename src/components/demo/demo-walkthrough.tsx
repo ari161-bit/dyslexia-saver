@@ -13,11 +13,13 @@ import {
   FileText,
   GraduationCap,
   Home,
+  ClipboardList,
   Loader2,
   Pause,
   Play,
   School,
   Sparkles,
+  Square,
   Users,
   Wand2,
   XCircle,
@@ -426,9 +428,14 @@ function PracticeStep() {
 function ProgressStep() {
   const roles = [
     { label: "Student", icon: GraduationCap, note: "Chooses the pathway that works for them" },
-    { label: "Teacher", icon: Users, note: "Sees which pathways were used, and where support may help" },
+    { label: "Teacher", icon: Users, note: "Creates classrooms, assigns lessons, and sees where support may help" },
     { label: "Parent", icon: Home, note: "Sees what their child completed, in plain language" },
     { label: "School", icon: School, note: "Sees adoption across classrooms" },
+  ];
+  const teacherActions = [
+    { label: "Create a classroom", icon: School },
+    { label: "Assign this lesson", icon: ClipboardList },
+    { label: "Track who needs support", icon: Users },
   ];
   return (
     <div>
@@ -456,6 +463,23 @@ function ProgressStep() {
           </motion.div>
         ))}
       </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.45, duration: 0.4 }}
+        className="mt-4 rounded-2xl border-2 border-primary/30 bg-primary/5 p-5"
+      >
+        <p className="mb-3 text-sm font-bold text-primary">Real teacher tools, not just a viewer</p>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {teacherActions.map(({ label, icon: Icon }) => (
+            <div key={label} className="flex items-center gap-2.5 rounded-xl bg-white px-3 py-2.5 text-sm font-medium">
+              <Icon className="h-4 w-4 shrink-0 text-primary" />
+              {label}
+            </div>
+          ))}
+        </div>
+      </motion.div>
     </div>
   );
 }
@@ -492,9 +516,14 @@ function FocusModeView({ onExit }: { onExit: () => void }) {
         {DEMO_LESSON_TEXT}
       </div>
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2">
-        <Button size="lg" className="h-14 rounded-full px-6 shadow-lg" onClick={toggleSpeak}>
-          {isSpeaking ? <Loader2 className="h-5 w-5 animate-spin" /> : <Play className="h-5 w-5" />}
-          {isSpeaking ? "Reading..." : "Read aloud"}
+        <Button
+          size="lg"
+          variant={isSpeaking ? "destructive" : "default"}
+          className="h-14 rounded-full px-6 shadow-lg"
+          onClick={toggleSpeak}
+        >
+          {isSpeaking ? <Square className="h-4 w-4 fill-current" /> : <Play className="h-5 w-5" />}
+          {isSpeaking ? "Stop" : "Read aloud"}
         </Button>
       </div>
     </div>
